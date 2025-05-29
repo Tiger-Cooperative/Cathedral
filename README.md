@@ -3,8 +3,11 @@
 </div>
 
 Cathedral is a fork of Space Station 14, which is a remake of Space Station 13 that operates on the Robust Toolbox engine. It is intended to serve as an alternative upstream that is able to be configured to the desires of multiple server owners on a case-by-case basis, rather than catering to a specific type of server. Similarly, there is a strong emphasis on hearing what the owners and operators of servers would like to see developed.
+
 The primary focus of changes made here will be to ensure that the mechanics and roles in this game have depth and impact, as well as being fun for those involved.
+
 As such, there is no designated roleplay level that the content here is intended for. Similarly, there currently is not any official server, and as of the time this is being written, it is unlikely that there will be one.
+
 If anybody has an interest in using this codebase for a server, they are invited to do so.
 
 ## Links
@@ -25,7 +28,7 @@ Additionally, see these resources for license and attribution information:
 ## Contributing
 
 Contributions are accepted by whoever may wish to offer help, though this project is still in a fledgling stage and thus changes and fixes to pre-existing content will be weighed more heavily than addition of new content.
-A list of [issues](https://github.com/Tiger-Cooperative/Cathedral/issues)
+The list of [issues](https://github.com/Tiger-Cooperative/Cathedral/issues) contains work that will need to be done, and the Discord server has channels for those who wish to contribute.
 
 ## Building
 
