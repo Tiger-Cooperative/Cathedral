@@ -34,7 +34,7 @@ The list of [issues](https://github.com/Tiger-Cooperative/Cathedral/issues) cont
 
 1. Clone this repo:
 ```shell
-git clone https://github.com/Tiger-Cooperative/Cathedral
+git clone https://github.com/Tiger-Cooperative/Cathedral.git
 ```
 2. Go to the project folder and run `RUN_THIS.py` to initialize the submodules and load the engine:
 ```shell
