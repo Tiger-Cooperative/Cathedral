@@ -18,6 +18,8 @@ public sealed partial class GunSystem
             DirtyField(uid, component, nameof(BallisticAmmoProviderComponent.Entities));
 
             Containers.Remove(existing, component.Container);
+            if (user != null)
+                _hands.TryPickup(user.Value, existing);
             EnsureShootable(existing);
         }
         else if (component.UnspawnedCount > 0)
@@ -31,9 +33,10 @@ public sealed partial class GunSystem
         if (ent != null)
         {
             if (user != null)
+            {
                 _hands.PickupOrDrop(user, ent.Value);
-            else EjectCartridge(ent.Value);
-
+            }
+            EjectCartridge(ent.Value);
         }
 
         var cycledEvent = new GunCycledEvent();
