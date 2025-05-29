@@ -20,7 +20,7 @@ public sealed partial class GunSystem
         }
     }
 
-    protected override void Cycle(EntityUid uid, BallisticAmmoProviderComponent component, MapCoordinates coordinates)
+    protected override void Cycle(EntityUid uid, BallisticAmmoProviderComponent component, MapCoordinates coordinates, EntityUid? user = null)
     {
         if (!Timing.IsFirstTimePredicted)
             return;
@@ -44,7 +44,12 @@ public sealed partial class GunSystem
         }
 
         if (ent != null && IsClientSide(ent.Value))
+        {
+            if (user != null)
+                _hands.PickupOrDrop(user, ent.Value);
             Del(ent.Value);
+        }
+
 
         var cycledEvent = new GunCycledEvent();
         RaiseLocalEvent(uid, ref cycledEvent);
