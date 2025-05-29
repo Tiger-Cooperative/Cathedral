@@ -22,7 +22,7 @@ public sealed partial class GunSystem
 
             Containers.Remove(existing, component.Container);
             // Pretty large check, but makes sure sounds play when they are supposed to and not when they aren't.
-            if ((user == null || !_hands.TryGetEmptyHand(user.Value, out var hand) || !_hands.TryPickupAnyHand(user.Value, existing)) && TryComp<CartridgeAmmoComponent>(existing, out var cartridge))
+            if ((user == null || !_hands.TryPickupAnyHand(user.Value, existing)) && TryComp<CartridgeAmmoComponent>(existing, out var cartridge))
                 Audio.PlayPvs(cartridge.EjectSound, existing, AudioParams.Default.WithVariation(SharedContentAudioSystem.DefaultVariation).WithVolume(-1f));
             EnsureShootable(existing);
         }
@@ -36,7 +36,7 @@ public sealed partial class GunSystem
 
         if (ent != null)
         {
-            if ((user == null || !_hands.TryGetEmptyHand(user.Value, out var hand) || !_hands.TryPickupAnyHand(user.Value, ent.Value)) && TryComp<CartridgeAmmoComponent>(ent.Value, out var cartridge))
+            if ((user == null|| !_hands.TryPickupAnyHand(user.Value, ent.Value)) && TryComp<CartridgeAmmoComponent>(ent.Value, out var cartridge))
                 EjectCartridge(ent.Value);
         }
 

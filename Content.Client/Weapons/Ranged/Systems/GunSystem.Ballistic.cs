@@ -34,7 +34,7 @@ public sealed partial class GunSystem
             component.Entities.RemoveAt(component.Entities.Count - 1);
 
             Containers.Remove(existing, component.Container);
-            if (user != null && _hands.TryGetEmptyHand(user.Value, out var hand))
+            if (user != null)
                 _hands.TryPickupAnyHand(user.Value, existing);
             EnsureShootable(existing);
         }
@@ -47,7 +47,7 @@ public sealed partial class GunSystem
 
         if (ent != null && IsClientSide(ent.Value))
         {
-            if (user != null && _hands.TryGetEmptyHand(user.Value, out var hand))
+            if (user != null)
                 _hands.TryPickupAnyHand(user.Value, ent.Value);
             Del(ent.Value);
         }
