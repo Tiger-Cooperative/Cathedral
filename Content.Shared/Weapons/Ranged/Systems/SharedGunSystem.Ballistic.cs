@@ -187,6 +187,7 @@ public abstract partial class SharedGunSystem
         {
             args.Verbs.Add(new AlternativeVerb()
             {
+                Text = Loc.GetString("gun-ballistic-grab-ammo"),
                 Disabled = GetBallisticShots(component) == 0,
                 // Eject to hand
                 Act = () => ManualCycle(uid, component, TransformSystem.GetMapCoordinates(uid), args.User, toHands: true),
