@@ -52,8 +52,8 @@ public sealed class HumanoidAppearanceSystem : SharedHumanoidAppearanceSystem
         var humanoidAppearance = entity.Comp1;
         var sprite = entity.Comp2;
 
-        _sprite.SetScale(entity.Owner, new Vector2(humanoidAppearance.Dimensions.Item1, humanoidAppearance.Dimensions.Item2));
         sprite[_sprite.LayerMapReserve((entity.Owner, sprite), HumanoidVisualLayers.Eyes)].Color = humanoidAppearance.EyeColor;
+        //_sprite.SetScale(entity.Owner, new Vector2(humanoidAppearance.Dimensions.Item1, humanoidAppearance.Dimensions.Item2));
     }
 
     private static bool IsHidden(HumanoidAppearanceComponent humanoid, HumanoidVisualLayers layer)
