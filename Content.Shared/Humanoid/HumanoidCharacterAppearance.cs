@@ -119,7 +119,7 @@ public sealed partial class HumanoidCharacterAppearance : ICharacterAppearance, 
             Color.Black,
             Color.Black,
             skinColor,
-            (1f, 1f),
+            (1f * speciesPrototype.DefaultScale, 1f * speciesPrototype.DefaultScale),
             new ()
         );
     }
@@ -177,11 +177,12 @@ public sealed partial class HumanoidCharacterAppearance : ICharacterAppearance, 
                 break;
         }
 
+        var scale = IoCManager.Resolve<IPrototypeManager>().Index<SpeciesPrototype>(species).DefaultScale;
 
         var height = random.NextFloat(0.75f, 1.26f);
         var width = random.NextFloat(height - 0.1f, height + 0.1f);
 
-        return new HumanoidCharacterAppearance(newHairStyle, newHairColor, newFacialHairStyle, newHairColor, newEyeColor, newSkinColor, (height, width), new ());
+        return new HumanoidCharacterAppearance(newHairStyle, newHairColor, newFacialHairStyle, newHairColor, newEyeColor, newSkinColor, (height * scale, width * scale), new ());
 
         float RandomizeColor(float channel)
         {
