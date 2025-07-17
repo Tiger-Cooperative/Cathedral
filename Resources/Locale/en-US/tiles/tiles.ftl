@@ -135,3 +135,7 @@ tiles-astro-snow = astro-snow
 tiles-astro-asteroid-sand = asteroid astro-sand
 tiles-astro-asteroid-sand-borderless = borderless asteroid astro-sand
 tiles-wood-large = large wood
+tiles-white-marble = white marble tile
+tiles-dark-marble = dark marble tile
+tiles-plasma-marble = plasmarble tile
+tiles-uranium-marble = uranium marble tile
