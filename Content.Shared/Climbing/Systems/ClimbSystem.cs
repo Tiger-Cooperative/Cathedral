@@ -11,8 +11,10 @@ using Content.Shared.Interaction;
 using Content.Shared.Movement.Events;
 using Content.Shared.Physics;
 using Content.Shared.Popups;
+using Content.Shared.Standing;
 using Content.Shared.Stunnable;
 using Content.Shared.Verbs;
+using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Physics;
@@ -60,6 +62,7 @@ public sealed partial class ClimbSystem : VirtualController
         SubscribeLocalEvent<ClimbingComponent, UpdateCanMoveEvent>(OnMoveAttempt);
         SubscribeLocalEvent<ClimbingComponent, EntParentChangedMessage>(OnParentChange);
         SubscribeLocalEvent<ClimbingComponent, ClimbDoAfterEvent>(OnDoAfter);
+        //SubscribeLocalEvent<ClimbableComponent, StartCollideEvent>(OnStartCollide);
         SubscribeLocalEvent<ClimbingComponent, EndCollideEvent>(OnClimbEndCollide);
         SubscribeLocalEvent<ClimbingComponent, BuckledEvent>(OnBuckled);
         SubscribeLocalEvent<ClimbingComponent, EntGotInsertedIntoContainerMessage>(OnStored);
@@ -294,7 +297,7 @@ public sealed partial class ClimbSystem : VirtualController
         var localDirection = (-parentRot).RotateVec(worldDirection);
 
         // On top of it already so just do it in place.
-        if (localDirection.LengthSquared() < 0.01f)
+        if (localDirection.LengthSquared() < 0.25f)
         {
             climbing.NextTransition = null;
         }

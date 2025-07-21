@@ -1,3 +1,5 @@
+using Content.Shared.Climbing.Components;
+using Content.Shared.Climbing.Systems;
 using Content.Shared.Hands.Components;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
@@ -13,6 +15,7 @@ public sealed class StandingStateSystem : EntitySystem
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly ClimbSystem _climbing = default!;
 
     // If StandingCollisionLayer value is ever changed to more than one layer, the logic needs to be edited.
     private const int StandingCollisionLayer = (int) CollisionGroup.MidImpassable;
@@ -153,10 +156,25 @@ public sealed class StandingStateSystem : EntitySystem
             foreach (var key in standingState.ChangedFixtures)
             {
                 if (fixtureComponent.Fixtures.TryGetValue(key, out var fixture))
+                {
                     _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask | StandingCollisionLayer, fixtureComponent);
+                }
+
+
             }
         }
         standingState.ChangedFixtures.Clear();
+        if (TryComp<ClimbingComponent>(uid, out var component))
+        {
+
+            foreach (var entity in _physics.GetEntitiesIntersectingBody(uid, StandingCollisionLayer, true))
+            {
+                if (TryComp<ClimbableComponent>(entity, out var climbable))
+                {
+                    _climbing.ForciblySetClimbing(uid, entity, component);
+                }
+            }
+        }
 
         return true;
     }
