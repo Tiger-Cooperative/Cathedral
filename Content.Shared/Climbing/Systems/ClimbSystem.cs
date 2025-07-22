@@ -297,7 +297,7 @@ public sealed partial class ClimbSystem : VirtualController
         var localDirection = (-parentRot).RotateVec(worldDirection);
 
         // On top of it already so just do it in place.
-        if (localDirection.LengthSquared() < 0.25f)
+        if (localDirection.LengthSquared() < 0.15f)
         {
             climbing.NextTransition = null;
         }
