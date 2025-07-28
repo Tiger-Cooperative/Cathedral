@@ -195,7 +195,6 @@
   - type: Edible
     useSound: *PlushieHampterSound
   - type: MeleeWeapon
-    wideAnimationRotation: 180
     soundHit: *PlushieHampterSound
   - type: Clothing
     quickEquip: false
@@ -359,7 +358,6 @@
     useSound:
       path: /Audio/Items/Toys/weh.ogg
   - type: MeleeWeapon
-    wideAnimationRotation: 180
     soundHit:
       path: /Audio/Items/Toys/weh.ogg
   - type: Extractable
@@ -428,7 +426,6 @@
     useSound:
       path: /Audio/Items/Toys/arf.ogg
   - type: MeleeWeapon
-    wideAnimationRotation: 180
     soundHit:
       path: /Audio/Items/Toys/arf.ogg
   - type: Clothing
@@ -514,7 +511,6 @@
     useSound:
       path: /Audio/Items/Toys/muffled_weh.ogg
   - type: MeleeWeapon
-    wideAnimationRotation: 180
     soundHit:
       path: /Audio/Items/Toys/muffled_weh.ogg
   - type: Clothing
@@ -555,7 +551,6 @@
     useSound:
       path: /Audio/Items/Toys/hew.ogg
   - type: MeleeWeapon
-    wideAnimationRotation: 180
     soundHit:
       path: /Audio/Items/Toys/hew.ogg
   - type: Extractable
@@ -612,7 +607,6 @@
     sound:
       path: /Audio/Items/Toys/toy_rustle.ogg
   - type: MeleeWeapon
-    wideAnimationRotation: 180
     soundHit:
       path: /Audio/Items/Toys/toy_rustle.ogg
     useSound:
@@ -916,6 +910,8 @@
     sound: *PlushieSlimeSound
   - type: EmitSoundOnActivate
     sound: *PlushieSlimeSound
+  - type: EmitSoundOnCollide
+    sound: *PlushieSlimeSound
   - type: EmitSoundOnTrigger
     sound: *PlushieSlimeSound
   - type: MeleeWeapon
@@ -1030,9 +1026,7 @@
     useSound:
       path: /Audio/Voice/Vox/shriek1.ogg
   - type: MeleeWeapon
-    wideAnimationRotation: 180
-    soundHit:
-      path: /Audio/Voice/Vox/shriek1.ogg
+    soundHit: *PlushieVoxSound
   - type: Clothing
     quickEquip: false
     sprite: Objects/Fun/Plushies/vox.rsi
@@ -1097,9 +1091,7 @@
     useSound:
       path: /Audio/Items/Toys/mousesqueek.ogg
   - type: MeleeWeapon
-    wideAnimationRotation: 180
-    soundHit:
-      path: /Audio/Weapons/Xeno/alien_spitacid.ogg
+    soundHit: *PlushieXenoSound
   - type: Clothing
     quickEquip: false
     sprite: Objects/Fun/Plushies/xeno.rsi
