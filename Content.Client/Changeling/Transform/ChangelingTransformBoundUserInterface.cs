@@ -1,4 +1,4 @@
-﻿using Content.Shared.Changeling.Transform;
+using Content.Shared.Changeling.Transform;
 using JetBrains.Annotations;
 using Robust.Client.UserInterface;
 
