@@ -101,7 +101,8 @@ public sealed class StandingStateSystem : EntitySystem
         {
             foreach (var (key, fixture) in fixtureComponent.Fixtures)
             {
-                if ((fixture.CollisionMask & StandingCollisionLayer) == 0)
+                if ((fixture.CollisionMask & StandingCollisionLayer) == 0
+                    && key != "climb")
                     continue;
 
                 standingState.ChangedFixtures.Add(key);
