@@ -7,6 +7,7 @@ using Content.Shared.Rotation;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
+using System.Linq;
 
 namespace Content.Shared.Standing;
 
@@ -156,26 +157,23 @@ public sealed class StandingStateSystem : EntitySystem
             foreach (var key in standingState.ChangedFixtures)
             {
                 if (fixtureComponent.Fixtures.TryGetValue(key, out var fixture))
-                {
-                    _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask | StandingCollisionLayer, fixtureComponent);
-                }
-
-
+                    if (TryComp<ClimbingComponent>(uid, out var climbing) && !climbing.IsClimbing)
+                    {
+                        //If the character is on top of a table, make them climb it without actually adding the layer.
+                        //It still needs to go into ChangedFixtures, though.
+                        if (!_physics.GetEntitiesIntersectingBody(uid, StandingCollisionLayer).Any(e => HasComp<ClimbableComponent>(e)))
+                        {
+                            _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask | StandingCollisionLayer, fixtureComponent);
+                        }
+                        else
+                        {
+                            climbing.IsClimbing = true;
+                            _climbing.ReplaceFixtures(uid, climbing, fixtureComponent);
+                        }
+                    }
             }
         }
         standingState.ChangedFixtures.Clear();
-        if (TryComp<ClimbingComponent>(uid, out var component))
-        {
-
-            foreach (var entity in _physics.GetEntitiesIntersectingBody(uid, StandingCollisionLayer, true))
-            {
-                if (TryComp<ClimbableComponent>(entity, out var climbable))
-                {
-                    _climbing.ForciblySetClimbing(uid, entity, component);
-                }
-            }
-        }
-
         return true;
     }
 }

@@ -352,7 +352,7 @@ public sealed partial class ClimbSystem : VirtualController
     /// Replaces the current fixtures with non-climbing collidable versions so that climb end can be detected
     /// </summary>
     /// <returns>Returns whether adding the new fixtures was successful</returns>
-    private bool ReplaceFixtures(EntityUid uid, ClimbingComponent climbingComp, FixturesComponent fixturesComp)
+    public bool ReplaceFixtures(EntityUid uid, ClimbingComponent climbingComp, FixturesComponent fixturesComp)
     {
         // Swap fixtures
         foreach (var (name, fixture) in fixturesComp.Fixtures)
