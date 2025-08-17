@@ -438,7 +438,9 @@ public sealed partial class ClimbSystem : VirtualController
                 continue;
             }
 
-            _physics.SetCollisionMask(uid, name, fixture, fixture.CollisionMask | fixtureMask, fixtures);
+            // Used for making sure that people can't permanently phase through tables if they are lying down when they stop colliding.
+            var masks = (fixtureMask & (int)CollisionGroup.MidImpassable) == 0 ? fixtureMask | (int)CollisionGroup.MidImpassable : (fixtureMask);
+            _physics.SetCollisionMask(uid, name, fixture, fixture.CollisionMask | masks, fixtures);
         }
 
         climbing.DisabledFixtureMasks.Clear();
