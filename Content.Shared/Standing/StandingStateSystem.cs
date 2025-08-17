@@ -106,7 +106,8 @@ public sealed class StandingStateSystem : EntitySystem
                     continue;
 
                 standingState.ChangedFixtures.Add(key);
-                _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask & ~StandingCollisionLayer, manager: fixtureComponent);
+                if (fixture.Hard)
+                    _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask & ~StandingCollisionLayer, manager: fixtureComponent);
             }
         }
 
