@@ -233,6 +233,7 @@ stack-astro-snow-floor = astro-snow floor
 stack-large-wood-floor = large wood floor
 stack-red-circuit-floor = red-circuit floor
 stack-asteroid-astro-sand-floor = asteroid astro-sand floor
+stack-xenoborg = xenoborg tile
 stack-dark-squiggly = dark steel squiggly tile
 stack-white-marble-floor = white marble floor
 stack-dark-marble-floor = dark marble floor
