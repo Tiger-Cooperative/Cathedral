@@ -265,7 +265,7 @@ public sealed partial class ClimbSystem : VirtualController
     }
 
     public void Climb(EntityUid uid, EntityUid user, EntityUid climbable, bool silent = false, ClimbingComponent? climbing = null,
-        PhysicsComponent? physics = null, FixturesComponent? fixtures = null, ClimbableComponent? comp = null)
+        PhysicsComponent? physics = null, FixturesComponent? fixtures = null, ClimbableComponent? comp = null, bool animation = true)
     {
         if (!Resolve(uid, ref climbing, ref physics, ref fixtures, false))
             return;
@@ -297,7 +297,7 @@ public sealed partial class ClimbSystem : VirtualController
         var localDirection = (-parentRot).RotateVec(worldDirection);
 
         // On top of it already so just do it in place.
-        if (localDirection.LengthSquared() < 0.15f)
+        if (localDirection.LengthSquared() < 0.15f || !animation)
         {
             climbing.NextTransition = null;
         }
@@ -438,7 +438,9 @@ public sealed partial class ClimbSystem : VirtualController
                 continue;
             }
 
-            _physics.SetCollisionMask(uid, name, fixture, fixture.CollisionMask | fixtureMask, fixtures);
+            // Used for making sure that people can't permanently phase through tables if they are lying down when they stop colliding.
+            var masks = (fixtureMask & (int)CollisionGroup.MidImpassable) == 0 ? fixtureMask | (int)CollisionGroup.MidImpassable : (fixtureMask);
+            _physics.SetCollisionMask(uid, name, fixture, fixture.CollisionMask | masks, fixtures);
         }
 
         climbing.DisabledFixtureMasks.Clear();
