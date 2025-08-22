@@ -1,9 +1,11 @@
 using System.Linq;
 using Content.Client.Gameplay;
 using Content.Shared.CombatMode;
+using Content.Shared.Coordinates;
 using Content.Shared.Effects;
 using Content.Shared.Hands.Components;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Physics;
 using Content.Shared.StatusEffect;
 using Content.Shared.Weapons.Melee;
 using Content.Shared.Weapons.Melee.Components;
@@ -16,7 +18,9 @@ using Robust.Client.Player;
 using Robust.Client.State;
 using Robust.Shared.Input;
 using Robust.Shared.Map;
+using Robust.Shared.Physics;
 using Robust.Shared.Player;
+using Robust.Shared.Utility;
 
 namespace Content.Client.Weapons.Melee;
 
@@ -31,10 +35,12 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
     [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
     [Dependency] private readonly MapSystem _map = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly EntityLookupSystem _lookup = default!;
 
     private EntityQuery<TransformComponent> _xformQuery;
 
     private const string MeleeLungeKey = "melee-lunge";
+    private const float MeleeRange = 0.075f;
 
     public override void Initialize()
     {
@@ -98,16 +104,16 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
             return;
         }
 
-        EntityCoordinates coordinates;
 
-        if (MapManager.TryFindGridAt(mousePos, out var gridUid, out _))
-        {
-            coordinates = TransformSystem.ToCoordinates(gridUid, mousePos);
-        }
-        else
-        {
-            coordinates = TransformSystem.ToCoordinates(_map.GetMap(mousePos.MapId), mousePos);
-        }
+        var direction = mousePos.Position - TransformSystem.GetWorldPosition(entity);
+        var ray = new CollisionRay(TransformSystem.GetWorldPosition(entity), direction.Normalized(), (int)CollisionGroup.InteractImpassable);
+        var rayResults = Physics.IntersectRay(mousePos.MapId, ray, Math.Min((TransformSystem.GetWorldPosition(entity) - mousePos.Position).Length(), weapon.Range), entity).ToList();
+
+        var worldRotation = MapManager.TryFindGridAt(TransformSystem.ToMapCoordinates(entity.ToCoordinates()), out var gridUid, out _) ? TransformSystem.GetWorldRotation(gridUid) : 0;
+
+        var coordinates = rayResults.FirstOrNull() != null
+            ? TransformSystem.GetMoverCoordinates(entity).Offset((direction.ToAngle() - worldRotation).ToVec().Normalized() * rayResults.First().Distance)
+            : TransformSystem.GetMoverCoordinates(entity).Offset((direction.ToAngle() - worldRotation).ToVec().Normalized() * Math.Min((TransformSystem.GetWorldPosition(entity) - mousePos.Position).Length(), weapon.Range));
 
         // If the gun has AltFireComponent, it can be used to attack.
         if (TryComp<GunComponent>(weaponUid, out var gun) && gun.UseKey)
@@ -115,7 +121,7 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
             if (!TryComp<AltFireMeleeComponent>(weaponUid, out var altFireComponent) || altDown != BoundKeyState.Down)
                 return;
 
-            switch(altFireComponent.AttackType)
+            switch (altFireComponent.AttackType)
             {
                 case AltFireAttackType.Light:
                     ClientLightAttack(entity, mousePos, coordinates, weaponUid, weapon);
@@ -200,7 +206,7 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
         EntityUid? target = null;
 
         if (_stateManager.CurrentState is GameplayStateBase screen)
-            target = screen.GetClickedEntity(mousePos);
+            target = _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id);
 
         RaisePredictiveEvent(new DisarmAttackEvent(GetNetEntity(target), GetNetCoordinates(coordinates)));
     }
@@ -215,7 +221,7 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
         EntityUid? target = null;
 
         if (_stateManager.CurrentState is GameplayStateBase screen)
-            target = screen.GetClickedEntity(mousePos);
+            target = _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id);
 
         // Don't light-attack if interaction will be handling this instead
         if (Interaction.CombatModeCanHandInteract(attacker, target))
