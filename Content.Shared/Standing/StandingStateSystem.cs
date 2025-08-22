@@ -100,11 +100,14 @@ public sealed class StandingStateSystem : EntitySystem
         {
             foreach (var (key, fixture) in fixtureComponent.Fixtures)
             {
-                if ((fixture.CollisionMask & StandingCollisionLayer) == 0)
+                if ((fixture.CollisionMask & StandingCollisionLayer) == 0
+                    // Slightly hacky, but makes sure that people are able to properly stand and fall on tables.
+                    && key != "climb")
                     continue;
 
                 standingState.ChangedFixtures.Add(key);
-                _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask & ~StandingCollisionLayer, manager: fixtureComponent);
+                if (fixture.Hard)
+                    _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask & ~StandingCollisionLayer, manager: fixtureComponent);
             }
         }
 
@@ -171,7 +174,7 @@ public sealed class StandingStateSystem : EntitySystem
             {
                 if (TryComp<ClimbableComponent>(entity, out var climbable))
                 {
-                    _climbing.ForciblySetClimbing(uid, entity, component);
+                    _climbing.Climb(uid, uid, entity, false, component, animation: false);
                 }
             }
         }
