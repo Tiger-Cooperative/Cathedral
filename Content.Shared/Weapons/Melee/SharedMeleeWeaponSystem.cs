@@ -6,6 +6,7 @@ using Content.Shared.Actions.Events;
 using Content.Shared.Administration.Components;
 using Content.Shared.Administration.Logs;
 using Content.Shared.CombatMode;
+using Content.Shared.Coordinates;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
@@ -37,6 +38,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 using ItemToggleMeleeWeaponComponent = Content.Shared.Item.ItemToggle.Components.ItemToggleMeleeWeaponComponent;
 
 namespace Content.Shared.Weapons.Melee;
@@ -721,6 +723,22 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Casts a ray and returns the furthest it can go without hitting a wall or other solid object.
+    /// </summary>
+    protected (EntityCoordinates, EntityUid?) TargetCast(EntityUid attacker, EntityCoordinates coordinates, MeleeWeaponComponent comp)
+    {
+        var direction = TransformSystem.ToWorldPosition(coordinates) - TransformSystem.GetWorldPosition(attacker);
+        var ray = new CollisionRay(TransformSystem.GetWorldPosition(attacker), direction.Normalized(), (int)CollisionGroup.InteractImpassable);
+        var rayResults = Physics.IntersectRay(TransformSystem.GetMapId(coordinates), ray, Math.Min((TransformSystem.GetWorldPosition(attacker) - TransformSystem.ToWorldPosition(coordinates)).Length(), comp.Range), attacker, false).ToList();
+
+        var worldRotation = MapManager.TryFindGridAt(TransformSystem.ToMapCoordinates(attacker.ToCoordinates()), out var gridUid, out _) ? TransformSystem.GetWorldRotation(gridUid) : 0;
+
+        return rayResults.FirstOrNull() != null
+            ? (TransformSystem.GetMoverCoordinates(attacker).Offset((direction.ToAngle() - worldRotation).ToVec().Normalized() * rayResults.First().Distance), rayResults.First().HitEntity)
+            : (TransformSystem.GetMoverCoordinates(attacker).Offset((direction.ToAngle() - worldRotation).ToVec().Normalized() * Math.Min((TransformSystem.GetWorldPosition(attacker) - TransformSystem.ToWorldPosition(coordinates)).Length(), comp.Range)), null);
     }
 
     protected HashSet<EntityUid> ArcRayCast(Vector2 position, Angle angle, Angle arcWidth, float range, MapId mapId, EntityUid ignore)

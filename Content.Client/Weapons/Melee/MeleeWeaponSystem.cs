@@ -22,6 +22,7 @@ using Robust.Shared.Input;
 using Robust.Shared.Map;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
+using Robust.Shared.Physics.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Utility;
 
@@ -39,7 +40,6 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
     [Dependency] private readonly MapSystem _map = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
     [Dependency] private readonly EntityLookupSystem _lookup = default!;
-    [Dependency] private readonly AudioSystem _audio = default!;
 
     private EntityQuery<TransformComponent> _xformQuery;
 
@@ -108,18 +108,9 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
             return;
         }
 
-
-        var direction = mousePos.Position - TransformSystem.GetWorldPosition(weaponUid);
-        var ray = new CollisionRay(TransformSystem.GetWorldPosition(weaponUid), direction.Normalized(), (int)CollisionGroup.InteractImpassable);
-        var rayResults = Physics.IntersectRay(TransformSystem.GetMapId(TransformSystem.GetMoverCoordinates(weaponUid)), ray, Math.Min((TransformSystem.GetWorldPosition(weaponUid) - mousePos.Position).Length(), weapon.Range), entity).ToList();
-        if (rayResults.FirstOrNull() == null)
-            _audio.PlayPvs(new SoundPathSpecifier("/Audio/Items/bikehorn.ogg"), entity);
-
-        var worldRotation = MapManager.TryFindGridAt(TransformSystem.ToMapCoordinates(weaponUid.ToCoordinates()), out var gridUid, out _) ? TransformSystem.GetWorldRotation(gridUid) : 0;
-
-        var coordinates = rayResults.FirstOrNull() != null
-            ? TransformSystem.GetMoverCoordinates(weaponUid).Offset((direction.ToAngle() - worldRotation).ToVec().Normalized() * rayResults.First().Distance)
-            : TransformSystem.GetMoverCoordinates(weaponUid).Offset((direction.ToAngle() - worldRotation).ToVec().Normalized() * Math.Min((TransformSystem.GetWorldPosition(entity) - mousePos.Position).Length(), weapon.Range));
+        var coordinates = MapManager.TryFindGridAt(mousePos, out var gridUid, out _)
+            ? TransformSystem.ToCoordinates(gridUid, mousePos)
+            : TransformSystem.ToCoordinates(_map.GetMap(mousePos.MapId), mousePos);
 
         // If the gun has AltFireComponent, it can be used to attack.
         if (TryComp<GunComponent>(weaponUid, out var gun) && gun.UseKey)
@@ -212,7 +203,7 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
         EntityUid? target = null;
 
         if (_stateManager.CurrentState is GameplayStateBase screen)
-            target = _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id);
+            target = screen.GetClickedEntity(mousePos);
 
         RaisePredictiveEvent(new DisarmAttackEvent(GetNetEntity(target), GetNetCoordinates(coordinates)));
     }
@@ -221,23 +212,31 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
     {
         var attackerPos = TransformSystem.GetMapCoordinates(attacker);
 
-        if (mousePos.MapId != attackerPos.MapId /*|| (attackerPos.Position - mousePos.Position).Length() > meleeComponent.Range*/)
+        if (mousePos.MapId != attackerPos.MapId)
             return;
 
         EntityUid? target = null;
         if (_stateManager.CurrentState is GameplayStateBase screen)
         {
-            // Issue: Attacking in the direction of a wall should prioritize solid objects over people.
-            // A possible solution is moving the InRange check to Shared, but determining target over there is odd.
-            // Also, the 'null' session makes me a little nervous.
-            var validEntity = _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id && TryComp<PhysicsComponent>(j, out var physics) && physics.Hard);
+            // 'null' session on InRange makes me a little nervous. If anything odd happens with multiple clients, I might have to re-do that part.
+            // Priority is: Clicked Entity -> Ray Collision -> Potential Target Around the Ray.
+            var targetCast = TargetCast(attacker, coordinates, meleeComponent);
+            coordinates = targetCast.Item1;
             var clicked = screen.GetClickedEntity(mousePos);
-            target = clicked != null && InRange(attacker, clicked.Value, meleeComponent.Range, null) ? clicked : validEntity;
-        }
 
-        // Don't light-attack if interaction will be handling this instead
-        if (Interaction.CombatModeCanHandInteract(attacker, target))
-            return;
+            if (clicked == null || !InRange(attacker, clicked.Value, meleeComponent.Range, null))
+            {
+                var validEntity = _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id && TryComp<PhysicsComponent>(j, out var physics) && (physics.CollisionMask & AttackMask) != 0);
+                target = targetCast.Item2 ?? validEntity;
+            }
+            else
+            {
+                // Don't light attack if interaction will be handling this instead.
+                if (Interaction.CombatModeCanHandInteract(attacker, clicked))
+                    return;
+                target = clicked;
+            }
+        }
 
         RaisePredictiveEvent(new LightAttackEvent(GetNetEntity(target), GetNetEntity(weaponUid), GetNetCoordinates(coordinates)));
     }
