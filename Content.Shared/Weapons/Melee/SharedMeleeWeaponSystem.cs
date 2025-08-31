@@ -59,7 +59,7 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
     [Dependency] private   readonly SharedAudioSystem _audio = default!;
     [Dependency] protected readonly SharedCombatModeSystem CombatMode = default!;
     [Dependency] protected readonly SharedInteractionSystem Interaction = default!;
-    [Dependency] protected readonly SharedPhysicsSystem Physics = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] protected readonly SharedPopupSystem PopupSystem = default!;
     [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
     [Dependency] private   readonly SharedStaminaSystem _stamina = default!;
@@ -474,10 +474,9 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
         // For consistency with wide attacks stuff needs damageable.
         if (Deleted(target) ||
             !HasComp<DamageableComponent>(target) ||
-            !TryComp(target, out TransformComponent? targetXform)
+            !TryComp(target, out TransformComponent? targetXform) ||
             // Not in LOS.
-            || !InRange(user, target.Value, component.Range, session)
-            )
+            !InRange(user, target.Value, component.Range, session))
         {
             // Leave IsHit set to true, because the only time it's set to false
             // is when a melee weapon is examined. Misses are inferred from an
@@ -726,13 +725,13 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
     }
 
     /// <summary>
-    /// Casts a ray and returns the furthest it can go without hitting a wall or other solid object.
+    /// Casts a ray and returns the furthest it can extend and the entity it collides with, if any.
     /// </summary>
     protected (EntityCoordinates, EntityUid?) TargetCast(EntityUid attacker, EntityCoordinates coordinates, MeleeWeaponComponent comp)
     {
         var direction = TransformSystem.ToWorldPosition(coordinates) - TransformSystem.GetWorldPosition(attacker);
         var ray = new CollisionRay(TransformSystem.GetWorldPosition(attacker), direction.Normalized(), (int)CollisionGroup.InteractImpassable);
-        var rayResults = Physics.IntersectRay(TransformSystem.GetMapId(coordinates), ray, Math.Min((TransformSystem.GetWorldPosition(attacker) - TransformSystem.ToWorldPosition(coordinates)).Length(), comp.Range), attacker, false).ToList();
+        var rayResults = _physics.IntersectRay(TransformSystem.GetMapId(coordinates), ray, Math.Min((TransformSystem.GetWorldPosition(attacker) - TransformSystem.ToWorldPosition(coordinates)).Length(), comp.Range), attacker, false).ToList();
 
         var worldRotation = MapManager.TryFindGridAt(TransformSystem.ToMapCoordinates(attacker.ToCoordinates()), out var gridUid, out _) ? TransformSystem.GetWorldRotation(gridUid) : 0;
 
@@ -754,7 +753,7 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
         for (var i = 0; i < increments; i++)
         {
             var castAngle = new Angle(baseAngle + increment * i);
-            var res = Physics.IntersectRay(mapId,
+            var res = _physics.IntersectRay(mapId,
                 new CollisionRay(position,
                     castAngle.ToWorldVec(),
                     AttackMask),
