@@ -6,6 +6,7 @@ using Content.Shared.Actions.Events;
 using Content.Shared.Administration.Components;
 using Content.Shared.Administration.Logs;
 using Content.Shared.CombatMode;
+using Content.Shared.Coordinates;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
@@ -37,6 +38,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 using ItemToggleMeleeWeaponComponent = Content.Shared.Item.ItemToggle.Components.ItemToggleMeleeWeaponComponent;
 
 namespace Content.Shared.Weapons.Melee;
@@ -57,12 +59,12 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
     [Dependency] private   readonly SharedAudioSystem _audio = default!;
     [Dependency] protected readonly SharedCombatModeSystem CombatMode = default!;
     [Dependency] protected readonly SharedInteractionSystem Interaction = default!;
-    [Dependency] private   readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] protected readonly SharedPopupSystem PopupSystem = default!;
     [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
     [Dependency] private   readonly SharedStaminaSystem _stamina = default!;
 
-    private const int AttackMask = (int) (CollisionGroup.MobMask | CollisionGroup.Opaque);
+    protected const int AttackMask = (int) (CollisionGroup.MobMask | CollisionGroup.Opaque);
 
     /// <summary>
     /// Maximum amount of targets allowed for a wide-attack.
@@ -720,6 +722,22 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Casts a ray and returns the furthest it can extend and the entity it collides with, if any.
+    /// </summary>
+    protected (EntityCoordinates, EntityUid?) TargetCast(EntityUid attacker, EntityCoordinates coordinates, MeleeWeaponComponent comp)
+    {
+        var direction = TransformSystem.ToWorldPosition(coordinates) - TransformSystem.GetWorldPosition(attacker);
+        var ray = new CollisionRay(TransformSystem.GetWorldPosition(attacker), direction.Normalized(), (int)CollisionGroup.InteractImpassable);
+        var rayResults = _physics.IntersectRay(TransformSystem.GetMapId(coordinates), ray, Math.Min((TransformSystem.GetWorldPosition(attacker) - TransformSystem.ToWorldPosition(coordinates)).Length(), comp.Range), attacker, false).ToList();
+
+        var worldRotation = MapManager.TryFindGridAt(TransformSystem.ToMapCoordinates(attacker.ToCoordinates()), out var gridUid, out _) ? TransformSystem.GetWorldRotation(gridUid) : 0;
+
+        return rayResults.FirstOrNull() != null
+            ? (TransformSystem.GetMoverCoordinates(attacker).Offset((direction.ToAngle() - worldRotation).ToVec().Normalized() * rayResults.First().Distance), rayResults.First().HitEntity)
+            : (TransformSystem.GetMoverCoordinates(attacker).Offset((direction.ToAngle() - worldRotation).ToVec().Normalized() * Math.Min((TransformSystem.GetWorldPosition(attacker) - TransformSystem.ToWorldPosition(coordinates)).Length(), comp.Range)), null);
     }
 
     protected HashSet<EntityUid> ArcRayCast(Vector2 position, Angle angle, Angle arcWidth, float range, MapId mapId, EntityUid ignore)
