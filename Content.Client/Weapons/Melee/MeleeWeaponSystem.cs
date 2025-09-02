@@ -208,13 +208,12 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
         EntityUid? target = null;
         if (_stateManager.CurrentState is GameplayStateBase screen)
         {
-            // 'null' session on InRange makes me a little nervous. If anything odd happens with multiple clients, I might have to re-do that part.
             // Priority is: Clicked Entity -> Ray Collision -> Potential Target Around the Ray.
             var targetCast = TargetCast(attacker, coordinates, meleeComponent);
             coordinates = targetCast.Item1;
             var clicked = screen.GetClickedEntity(mousePos);
 
-            if (clicked == null || !InRange(attacker, clicked.Value, meleeComponent.Range, null))
+            if (clicked == null || (TransformSystem.GetWorldPosition(attacker) - TransformSystem.GetWorldPosition(clicked.Value)).Length() > meleeComponent.Range)
             {
                 var validEntity = _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id && TryComp<PhysicsComponent>(j, out var physics) && (physics.CollisionMask & AttackMask) != 0);
                 target = targetCast.Item2 ?? validEntity;
