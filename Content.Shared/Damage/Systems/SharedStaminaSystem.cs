@@ -315,7 +315,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
 
         if (visual)
         {
-            _color.RaiseEffect(Color.Aqua, new List<EntityUid>() { uid }, Filter.Pvs(uid, entityManager: EntityManager));
+            DoColorFlash(uid, source);
         }
 
         if (_net.IsServer)
@@ -323,6 +323,8 @@ public abstract partial class SharedStaminaSystem : EntitySystem
             _audio.PlayPvs(sound, uid);
         }
     }
+
+    protected abstract void DoColorFlash(EntityUid ent, EntityUid? source);
 
     public override void Update(float frameTime)
     {
