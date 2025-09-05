@@ -6,7 +6,6 @@ using Content.Shared.CombatMode;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Events;
 using Content.Shared.Database;
-using Content.Shared.Effects;
 using Content.Shared.FixedPoint;
 using Content.Shared.Projectiles;
 using Content.Shared.Rejuvenate;
@@ -18,8 +17,6 @@ using JetBrains.Annotations;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Configuration;
-using Robust.Shared.Network;
-using Robust.Shared.Player;
 using Robust.Shared.Timing;
 
 namespace Content.Shared.Damage.Systems;
@@ -30,7 +27,6 @@ public abstract partial class SharedStaminaSystem : EntitySystem
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly MetaDataSystem _metadata = default!;
-    [Dependency] private readonly SharedColorFlashEffectSystem _color = default!;
     [Dependency] private readonly SharedStunSystem _stunSystem = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
     [Dependency] private readonly IConfigurationManager _config = default!;
