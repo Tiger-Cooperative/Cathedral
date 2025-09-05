@@ -27,7 +27,6 @@ namespace Content.Shared.Damage.Systems;
 public abstract partial class SharedStaminaSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly INetManager _net = default!;
     [Dependency] private readonly ISharedAdminLogManager _adminLogger = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly MetaDataSystem _metadata = default!;
@@ -318,10 +317,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
             DoColorFlash(uid, source);
         }
 
-        if (_net.IsServer)
-        {
-            _audio.PlayPvs(sound, uid);
-        }
+        _audio.PlayPredicted(sound, uid, source);
     }
 
     protected abstract void DoColorFlash(EntityUid ent, EntityUid? source);
