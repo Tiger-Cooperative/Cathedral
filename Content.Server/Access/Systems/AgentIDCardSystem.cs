@@ -80,7 +80,7 @@ namespace Content.Server.Access.Systems
             if (!TryComp<IdCardComponent>(uid, out var idCard))
                 return;
 
-            if (!_prototypeManager.TryIndex(args.JobIconId, out var jobIcon))
+            if (!_prototypeManager.Resolve(args.JobIconId, out var jobIcon))
                 return;
 
             _cardSystem.TryChangeJobIcon(uid, jobIcon, idCard);
