@@ -119,7 +119,7 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
                     break;
 
                 case AltFireAttackType.Disarm:
-                    ClientDisarm(entity, mousePos, coordinates);
+                    ClientDisarm(entity, mousePos, coordinates, weapon);
                     break;
             }
 
@@ -132,7 +132,7 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
             // If it's an unarmed attack then do a disarm
             if (weapon.AltDisarm && weaponUid == entity)
             {
-                ClientDisarm(entity, mousePos, coordinates);
+                ClientDisarm(entity, mousePos, coordinates, weapon);
                 return;
             }
 
@@ -154,10 +154,11 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
         return Interaction.InRangeUnobstructed(user, target, targetCoordinates, targetLocalAngle, range, overlapCheck: false);
     }
 
-    protected override void DoDamageEffect(List<EntityUid> targets, EntityUid? user, TransformComponent targetXform)
+    protected override void DoDamageEffect(List<EntityUid> targets, EntityUid? user, TransformComponent targetXform, bool push = false)
     {
         // Server never sends the event to us for predictiveeevent.
-        _color.RaiseEffect(Color.Red, targets, Filter.Local());
+        var color = push ? Color.Aqua : Color.Red;
+        _color.RaiseEffect(color, targets, Filter.Local());
     }
 
     /// <summary>
@@ -188,12 +189,30 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
         RaisePredictiveEvent(new HeavyAttackEvent(GetNetEntity(meleeUid), entities.GetRange(0, Math.Min(MaxTargets, entities.Count)), GetNetCoordinates(coordinates)));
     }
 
-    private void ClientDisarm(EntityUid attacker, MapCoordinates mousePos, EntityCoordinates coordinates)
+    private void ClientDisarm(EntityUid attacker, MapCoordinates mousePos, EntityCoordinates coordinates, MeleeWeaponComponent meleeComponent)
     {
         EntityUid? target = null;
 
         if (_stateManager.CurrentState is GameplayStateBase screen)
-            target = screen.GetClickedEntity(mousePos);
+        {
+            // Priority is: Clicked Entity -> Ray Collision -> Potential Target Around the Ray.
+            var targetCast = TargetCast(attacker, coordinates, meleeComponent);
+            coordinates = targetCast.Item1;
+            var clicked = screen.GetClickedEntity(mousePos);
+
+            if (clicked == null || (TransformSystem.GetWorldPosition(attacker) - TransformSystem.GetWorldPosition(clicked.Value)).Length() > meleeComponent.Range)
+            {
+                var validEntity = _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id && TryComp<PhysicsComponent>(j, out var physics) && (physics.CollisionMask & AttackMask) != 0);
+                target = targetCast.Item2 ?? validEntity;
+            }
+            else
+            {
+                // Don't light attack if interaction will be handling this instead.
+                if (Interaction.CombatModeCanHandInteract(attacker, clicked))
+                    return;
+                target = clicked;
+            }
+        }
 
         RaisePredictiveEvent(new DisarmAttackEvent(GetNetEntity(target), GetNetCoordinates(coordinates)));
     }

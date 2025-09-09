@@ -48,7 +48,7 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         SubscribeLocalEvent<StaminaComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<StaminaComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<StaminaComponent, AfterAutoHandleStateEvent>(OnStamHandleState);
-        SubscribeLocalEvent<StaminaComponent, DisarmedEvent>(OnDisarmed);
+        //SubscribeLocalEvent<StaminaComponent, DisarmedEvent>(OnDisarmed);
         SubscribeLocalEvent<StaminaComponent, RejuvenateEvent>(OnRejuvenate);
 
         SubscribeLocalEvent<StaminaDamageOnEmbedComponent, EmbedEvent>(OnProjectileEmbed);
@@ -113,22 +113,22 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         Dirty(uid, component);
     }
 
-    private void OnDisarmed(EntityUid uid, StaminaComponent component, ref DisarmedEvent args)
-    {
-        if (args.Handled)
-            return;
+    //private void OnDisarmed(EntityUid uid, StaminaComponent component, ref DisarmedEvent args)
+    //{
+    //    if (args.Handled)
+    //        return;
 
-        if (component.Critical)
-            return;
+    //    if (component.Critical)
+    //        return;
 
-        var damage = args.PushProbability * component.CritThreshold;
-        TakeStaminaDamage(uid, damage, component, source: args.Source);
+    //    var damage = args.PushProbability * component.CritThreshold;
+    //    TakeStaminaDamage(uid, damage, component, source: args.Source);
 
-        args.PopupPrefix = "disarm-action-shove-";
-        args.IsStunned = component.Critical;
+    //    args.PopupPrefix = "disarm-action-shove-";
+    //    args.IsStunned = component.Critical;
 
-        args.Handled = true;
-    }
+    //    args.Handled = true;
+    //}
 
     private void OnMeleeHit(EntityUid uid, StaminaDamageOnHitComponent component, MeleeHitEvent args)
     {

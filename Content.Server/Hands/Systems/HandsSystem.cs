@@ -3,6 +3,7 @@ using Content.Server.Inventory;
 using Content.Server.Stack;
 using Content.Server.Stunnable;
 using Content.Shared.ActionBlocker;
+using Content.Shared.Actions.Events;
 using Content.Shared.Body.Part;
 using Content.Shared.CombatMode;
 using Content.Shared.Damage.Systems;
@@ -51,7 +52,7 @@ namespace Content.Server.Hands.Systems
         {
             base.Initialize();
 
-            SubscribeLocalEvent<HandsComponent, DisarmedEvent>(OnDisarmed, before: new[] {typeof(StunSystem), typeof(SharedStaminaSystem)});
+            //SubscribeLocalEvent<HandsComponent, PushEvent>(OnDisarm);
 
             SubscribeLocalEvent<HandsComponent, BodyPartAddedEvent>(HandleBodyPartAdded);
             SubscribeLocalEvent<HandsComponent, BodyPartRemovedEvent>(HandleBodyPartRemoved);
@@ -94,23 +95,13 @@ namespace Content.Server.Hands.Systems
             }
         }
 
-        private void OnDisarmed(EntityUid uid, HandsComponent component, ref DisarmedEvent args)
-        {
-            if (args.Handled)
-                return;
-
-            // Break any pulls
-            if (TryComp(uid, out PullerComponent? puller) && TryComp(puller.Pulling, out PullableComponent? pullable))
-                _pullingSystem.TryStopPull(puller.Pulling.Value, pullable);
-
-            var offsetRandomCoordinates = _transformSystem.GetMoverCoordinates(args.Target).Offset(_random.NextVector2(1f, 1.5f));
-            if (!ThrowHeldItem(args.Target, offsetRandomCoordinates))
-                return;
-
-            args.PopupPrefix = "disarm-action-";
-
-            args.Handled = true; // no shove/stun.
-        }
+        //private void OnDisarm(EntityUid uid, HandsComponent component, PushEvent args)
+        //{
+        //    if (args.Handled)
+        //        return;
+        //    Console.WriteLine("honk");
+        //    args.Handled = true; // no shove/stun.
+        //}
 
         private void HandleBodyPartAdded(EntityUid uid, HandsComponent component, ref BodyPartAddedEvent args)
         {
