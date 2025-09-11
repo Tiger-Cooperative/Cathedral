@@ -1,19 +1,11 @@
 using System.Numerics;
-using Content.Server.Inventory;
 using Content.Server.Stack;
-using Content.Server.Stunnable;
 using Content.Shared.ActionBlocker;
-using Content.Shared.Actions.Events;
 using Content.Shared.Body.Part;
-using Content.Shared.CombatMode;
-using Content.Shared.Damage.Systems;
 using Content.Shared.Explosion;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Input;
-using Content.Shared.Inventory.VirtualItem;
-using Content.Shared.Movement.Pulling.Components;
-using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Stacks;
 using Content.Shared.Standing;
@@ -36,7 +28,6 @@ namespace Content.Server.Hands.Systems
         [Dependency] private readonly StackSystem _stackSystem = default!;
         [Dependency] private readonly ActionBlockerSystem _actionBlockerSystem = default!;
         [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
-        [Dependency] private readonly PullingSystem _pullingSystem = default!;
         [Dependency] private readonly ThrowingSystem _throwingSystem = default!;
 
         private EntityQuery<PhysicsComponent> _physicsQuery;
@@ -52,7 +43,6 @@ namespace Content.Server.Hands.Systems
         {
             base.Initialize();
 
-            //SubscribeLocalEvent<HandsComponent, PushEvent>(OnDisarm);
 
             SubscribeLocalEvent<HandsComponent, BodyPartAddedEvent>(HandleBodyPartAdded);
             SubscribeLocalEvent<HandsComponent, BodyPartRemovedEvent>(HandleBodyPartRemoved);
@@ -94,14 +84,6 @@ namespace Content.Server.Hands.Systems
                     args.Contents.Add(uid);
             }
         }
-
-        //private void OnDisarm(EntityUid uid, HandsComponent component, PushEvent args)
-        //{
-        //    if (args.Handled)
-        //        return;
-        //    Console.WriteLine("honk");
-        //    args.Handled = true; // no shove/stun.
-        //}
 
         private void HandleBodyPartAdded(EntityUid uid, HandsComponent component, ref BodyPartAddedEvent args)
         {

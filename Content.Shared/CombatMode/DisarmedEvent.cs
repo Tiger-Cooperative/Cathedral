@@ -1,7 +1,7 @@
 namespace Content.Shared.CombatMode;
 
 [ByRefEvent]
-public record struct DisarmedEvent(EntityUid Target, EntityUid Source)
+public record struct ShovedEvent(EntityUid Target, EntityUid Source)
 {
     /// <summary>
     /// The entity being disarmed.

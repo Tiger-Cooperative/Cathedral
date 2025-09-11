@@ -2,7 +2,6 @@ using System.Linq;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Alert;
 using Content.Shared.CCVar;
-using Content.Shared.CombatMode;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Events;
 using Content.Shared.Database;
@@ -48,7 +47,6 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         SubscribeLocalEvent<StaminaComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<StaminaComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<StaminaComponent, AfterAutoHandleStateEvent>(OnStamHandleState);
-        //SubscribeLocalEvent<StaminaComponent, DisarmedEvent>(OnDisarmed);
         SubscribeLocalEvent<StaminaComponent, RejuvenateEvent>(OnRejuvenate);
 
         SubscribeLocalEvent<StaminaDamageOnEmbedComponent, EmbedEvent>(OnProjectileEmbed);
@@ -112,23 +110,6 @@ public abstract partial class SharedStaminaSystem : EntitySystem
         SetStaminaAlert(uid, component);
         Dirty(uid, component);
     }
-
-    //private void OnDisarmed(EntityUid uid, StaminaComponent component, ref DisarmedEvent args)
-    //{
-    //    if (args.Handled)
-    //        return;
-
-    //    if (component.Critical)
-    //        return;
-
-    //    var damage = args.PushProbability * component.CritThreshold;
-    //    TakeStaminaDamage(uid, damage, component, source: args.Source);
-
-    //    args.PopupPrefix = "disarm-action-shove-";
-    //    args.IsStunned = component.Critical;
-
-    //    args.Handled = true;
-    //}
 
     private void OnMeleeHit(EntityUid uid, StaminaDamageOnHitComponent component, MeleeHitEvent args)
     {

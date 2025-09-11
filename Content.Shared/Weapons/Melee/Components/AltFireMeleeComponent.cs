@@ -18,5 +18,5 @@ public enum AltFireAttackType : byte
 {
     Light = 0, // Standard single-target attack.
     Heavy = 1 << 0, // Wide swing.
-    Disarm = 1 << 1
+    Shove = 1 << 1
 }

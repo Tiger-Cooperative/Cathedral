@@ -52,7 +52,7 @@
       settings: default
   - type: GhostTakeoverAvailable
   - type: MeleeWeapon
-    altDisarm: false
+    altShove: false
     animation: WeaponArcBite
     damage:
       types:

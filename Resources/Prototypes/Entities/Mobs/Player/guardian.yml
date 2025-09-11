@@ -87,7 +87,7 @@
     - type: Pullable
     - type: MeleeWeapon
       hidden: false
-      altDisarm: false
+      altShove: false
       animation: WeaponArcFist
       attackRate: 1.8
       autoAttack: true

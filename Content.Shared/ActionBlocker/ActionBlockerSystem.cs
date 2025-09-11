@@ -190,7 +190,7 @@ namespace Content.Shared.ActionBlocker
             return !ev.Cancelled;
         }
 
-        public bool CanAttack(EntityUid uid, EntityUid? target = null, Entity<MeleeWeaponComponent>? weapon = null, bool disarm = false)
+        public bool CanAttack(EntityUid uid, EntityUid? target = null, Entity<MeleeWeaponComponent>? weapon = null, bool shove = false)
         {
             // If target is in a container can we attack
             if (target != null && _container.IsEntityInContainer(target.Value))
@@ -209,7 +209,7 @@ namespace Content.Shared.ActionBlocker
                     return false;
             }
 
-            var ev = new AttackAttemptEvent(uid, target, weapon, disarm);
+            var ev = new AttackAttemptEvent(uid, target, weapon, shove);
             RaiseLocalEvent(uid, ev);
 
             if (ev.Cancelled)
@@ -218,7 +218,7 @@ namespace Content.Shared.ActionBlocker
             if (target == null)
                 return true;
 
-            var tev = new GettingAttackedAttemptEvent(uid, weapon, disarm);
+            var tev = new GettingAttackedAttemptEvent(uid, weapon, shove);
             RaiseLocalEvent(target.Value, ref tev);
             return !tev.Cancelled;
         }

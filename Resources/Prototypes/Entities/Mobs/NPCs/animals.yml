@@ -2545,7 +2545,7 @@
       Dead:
         Base: tarantula_dead
   - type: MeleeWeapon
-    altDisarm: false
+    altShove: false
     angle: 0
     animation: WeaponArcBite
     soundHit:
@@ -2591,7 +2591,7 @@
     - type: Spider
       webPrototype: SpiderWebClown
     - type: MeleeWeapon
-      altDisarm: false
+      altShove: false
       angle: 0
       animation: WeaponArcBite
       soundHit:
@@ -3031,7 +3031,7 @@
     interactSuccessSound:
       path: /Audio/Animals/cat_meow.ogg
   - type: MeleeWeapon
-    altDisarm: false
+    altShove: false
     angle: 0
     animation: WeaponArcBite
     soundHit:
@@ -3108,7 +3108,7 @@
     factions:
     - Syndicate
   - type: MeleeWeapon
-    altDisarm: false
+    altShove: false
     angle: 0
     animation: WeaponArcBite
     soundHit:

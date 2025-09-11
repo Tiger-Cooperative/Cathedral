@@ -43,7 +43,7 @@
     speedModifierThresholds:
       10: 0.7
   - type: MeleeWeapon
-    altDisarm: false
+    altShove: false
     angle: 0
     soundHit:
       path: /Audio/Weapons/bladeslice.ogg

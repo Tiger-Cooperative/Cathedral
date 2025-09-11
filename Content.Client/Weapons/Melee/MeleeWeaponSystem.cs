@@ -118,8 +118,8 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
                     ClientHeavyAttack(entity, coordinates, weaponUid, weapon);
                     break;
 
-                case AltFireAttackType.Disarm:
-                    ClientDisarm(entity, mousePos, coordinates, weapon);
+                case AltFireAttackType.Shove:
+                    ClientShove(entity, mousePos, coordinates, weapon);
                     break;
             }
 
@@ -129,10 +129,10 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
         // Heavy attack.
         if (altDown == BoundKeyState.Down)
         {
-            // If it's an unarmed attack then do a disarm
-            if (weapon.AltDisarm && weaponUid == entity)
+            // If it's an unarmed attack then do a shove.
+            if (weapon.AltShove && weaponUid == entity)
             {
-                ClientDisarm(entity, mousePos, coordinates, weapon);
+                ClientShove(entity, mousePos, coordinates, weapon);
                 return;
             }
 
@@ -189,7 +189,7 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
         RaisePredictiveEvent(new HeavyAttackEvent(GetNetEntity(meleeUid), entities.GetRange(0, Math.Min(MaxTargets, entities.Count)), GetNetCoordinates(coordinates)));
     }
 
-    private void ClientDisarm(EntityUid attacker, MapCoordinates mousePos, EntityCoordinates coordinates, MeleeWeaponComponent meleeComponent)
+    private void ClientShove(EntityUid attacker, MapCoordinates mousePos, EntityCoordinates coordinates, MeleeWeaponComponent meleeComponent)
     {
         EntityUid? target = null;
 
@@ -200,21 +200,12 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
             coordinates = targetCast.Item1;
             var clicked = screen.GetClickedEntity(mousePos);
 
-            if (clicked == null || (TransformSystem.GetWorldPosition(attacker) - TransformSystem.GetWorldPosition(clicked.Value)).Length() > meleeComponent.Range)
-            {
-                var validEntity = _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id && TryComp<PhysicsComponent>(j, out var physics) && (physics.CollisionMask & AttackMask) != 0);
-                target = targetCast.Item2 ?? validEntity;
-            }
-            else
-            {
-                // Don't light attack if interaction will be handling this instead.
-                if (Interaction.CombatModeCanHandInteract(attacker, clicked))
-                    return;
-                target = clicked;
-            }
+            target = (clicked == null || (TransformSystem.GetWorldPosition(attacker) - TransformSystem.GetWorldPosition(clicked.Value)).Length() > meleeComponent.Range)
+            ? targetCast.Item2 ?? _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id && TryComp<PhysicsComponent>(j, out var physics) && (physics.CollisionMask & AttackMask) != 0)
+            : clicked;
         }
 
-        RaisePredictiveEvent(new DisarmAttackEvent(GetNetEntity(target), GetNetCoordinates(coordinates)));
+        RaisePredictiveEvent(new ShoveAttackEvent(GetNetEntity(target), GetNetCoordinates(coordinates)));
     }
 
     private void ClientLightAttack(EntityUid attacker, MapCoordinates mousePos, EntityCoordinates coordinates, EntityUid weaponUid, MeleeWeaponComponent meleeComponent)
@@ -232,7 +223,7 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
             coordinates = targetCast.Item1;
             var clicked = screen.GetClickedEntity(mousePos);
 
-            if (clicked == null || (TransformSystem.GetWorldPosition(attacker) - TransformSystem.GetWorldPosition(clicked.Value)).Length() > meleeComponent.Range)
+            if (clicked == null || (TransformSystem.GetWorldPosition(attacker) - mousePos.Position).Length() > meleeComponent.Range)
             {
                 var validEntity = _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id && TryComp<PhysicsComponent>(j, out var physics) && (physics.CollisionMask & AttackMask) != 0);
                 target = targetCast.Item2 ?? validEntity;

@@ -17,16 +17,16 @@ namespace Content.Shared.Interaction.Events
         public Entity<MeleeWeaponComponent>? Weapon { get; }
 
         /// <summary>
-        ///     If this attempt is a disarm as opposed to an actual attack, for things that care about the difference.
+        ///     If this attempt is a shove as opposed to an actual attack, for things that care about the difference.
         /// </summary>
-        public bool Disarm { get; }
+        public bool Shove { get; }
 
-        public AttackAttemptEvent(EntityUid uid, EntityUid? target = null, Entity<MeleeWeaponComponent>? weapon = null, bool disarm = false)
+        public AttackAttemptEvent(EntityUid uid, EntityUid? target = null, Entity<MeleeWeaponComponent>? weapon = null, bool shove = false)
         {
             Uid = uid;
             Target = target;
             Weapon = weapon;
-            Disarm = disarm;
+            Shove = shove;
         }
     }
 

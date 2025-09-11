@@ -21,7 +21,7 @@ public sealed class NPCRetaliationSystem : EntitySystem
     public override void Initialize()
     {
         SubscribeLocalEvent<NPCRetaliationComponent, DamageChangedEvent>(OnDamageChanged);
-        SubscribeLocalEvent<NPCRetaliationComponent, DisarmedEvent>(OnDisarmed);
+        SubscribeLocalEvent<NPCRetaliationComponent, ShovedEvent>(OnShoved);
     }
 
     private void OnDamageChanged(Entity<NPCRetaliationComponent> ent, ref DamageChangedEvent args)
@@ -35,7 +35,7 @@ public sealed class NPCRetaliationSystem : EntitySystem
         TryRetaliate(ent, origin);
     }
 
-    private void OnDisarmed(Entity<NPCRetaliationComponent> ent, ref DisarmedEvent args)
+    private void OnShoved(Entity<NPCRetaliationComponent> ent, ref ShovedEvent args)
     {
         TryRetaliate(ent, args.Source);
     }
