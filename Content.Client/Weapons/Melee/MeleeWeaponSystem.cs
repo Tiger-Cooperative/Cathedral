@@ -195,12 +195,11 @@ public sealed partial class MeleeWeaponSystem : SharedMeleeWeaponSystem
 
         if (_stateManager.CurrentState is GameplayStateBase screen)
         {
-            // Priority is: Clicked Entity -> Ray Collision -> Potential Target Around the Ray.
             var targetCast = TargetCast(attacker, coordinates, meleeComponent);
             coordinates = targetCast.Item1;
             var clicked = screen.GetClickedEntity(mousePos);
 
-            target = (clicked == null || (TransformSystem.GetWorldPosition(attacker) - TransformSystem.GetWorldPosition(clicked.Value)).Length() > meleeComponent.Range)
+            target = (clicked == null || (TransformSystem.GetWorldPosition(attacker) - mousePos.Position).Length() > meleeComponent.Range)
             ? targetCast.Item2 ?? _lookup.GetEntitiesInRange(coordinates, MeleeRange).FirstOrNull(j => j.Id != attacker.Id && TryComp<PhysicsComponent>(j, out var physics) && (physics.CollisionMask & AttackMask) != 0)
             : clicked;
         }
