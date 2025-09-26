@@ -527,6 +527,8 @@
     sound: *PlushieLizardInversedSound
   - type: EmitSoundOnActivate
     sound: *PlushieLizardInversedSound
+  - type: EmitSoundOnCollide
+    sound: *PlushieLizardInversedSound
   - type: EmitSoundOnTrigger
     sound: *PlushieLizardInversedSound
   - type: MeleeWeapon
@@ -583,7 +585,6 @@
   - type: EmitSoundOnCollide
     sound: *PlushieDionaSound
   - type: MeleeWeapon
-    wideAnimationRotation: 180
     soundHit: *PlushieDionaSound
   - type: SolutionContainerManager
     solutions:
