@@ -14,13 +14,11 @@
     - INNERCLOTHING
     - HEAD
     femaleMask: UniformTop
-    equipSound: 
-    unequipSound: 
+    equipSound:
+    unequipSound:
   - type: Spillable
     solution: absorbed
     spillWhenThrown: false
-  - type: DrainableSolution
-    solution: absorbed
   - type: Absorbent
     pickupAmount: 15
   - type: SolutionContainerManager
