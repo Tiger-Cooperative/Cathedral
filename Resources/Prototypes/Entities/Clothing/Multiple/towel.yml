@@ -9,7 +9,7 @@
     sprite: Clothing/Multiple/towel.rsi
   - type: Clothing
     sprite: Clothing/Multiple/towel.rsi
-    slots: 
+    slots:
     - BELT
     - INNERCLOTHING
     - HEAD
