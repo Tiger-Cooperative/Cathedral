@@ -163,7 +163,7 @@
         color: "#0089EF"
   - type: Fiber
     fiberColor: fibers-blue
-    
+
 - type: entity
   id: TowelColorDarkBlue
   name: dark blue towel
@@ -766,4 +766,3 @@
         color: "#535353"
   - type: Fiber
     fiberColor: fibers-black
-    
