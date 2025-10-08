@@ -473,6 +473,13 @@
     accentVColor: "#a23e3e"
   - type: Icon
     state: pda-qm
+  - type: CartridgeLoader
+    preinstalled:
+    - CrewManifestCartridge
+    - NotekeeperCartridge
+    - NanoTaskCartridge
+    - NewsReaderCartridge
+    - AstroNavCartridge
 
 - type: entity
   parent: BasePDA
@@ -1417,6 +1424,25 @@
     accentVColor: "#DFDFDF"
   - type: Icon
     state: pda-seniorofficer
+
+- type: entity
+  parent: BasePDA
+  id: SeniorCourierPDA
+  name: senior courier PDA
+  description: Smells like postage stamps and shuttle fuel.
+  components:
+  - type: Pda
+    id: CargoIDCard
+  - type: Appearance
+    appearanceDataInit:
+     enum.PdaVisuals.PdaType:
+       !type:String
+       pda-seniorcourier
+  - type: PdaBorderColor
+    borderColor: "#e39751"
+    accentVColor: "#DFDFDF"
+  - type: Icon
+    state: pda-seniorcourier
 
 - type: entity
   parent: [ BaseMajorContraband, SyndiPDA ]
