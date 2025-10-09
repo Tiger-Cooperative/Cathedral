@@ -15,7 +15,6 @@
     doctor: LockerMedical
     electrical: LockerElectricalSupplies
     engineer: LockerEngineer
-    evac: LockerEvacRepair
     hop: LockerHeadOfPersonnel
     hos: LockerHeadOfSecurity
     mime: LockerMime
@@ -76,5 +75,4 @@
   cost: 2
   defaultStyle: medical
   styles:
-    evac: LockerWallEvacRepair
     medical: LockerWallMedical
