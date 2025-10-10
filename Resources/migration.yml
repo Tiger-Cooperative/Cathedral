@@ -710,5 +710,6 @@ ClothingUniformJumpsuitParamedicNT: ClothingUniformJumpsuitParamedic
 # 2025-08-29
 PrefilledSyringe: Syringe
 
-# 2025-10-8
+# 2025-10-08
 ClothingBeltAssault: ClothingBeltMilitaryWebbing
+WarpPointBombing: null
