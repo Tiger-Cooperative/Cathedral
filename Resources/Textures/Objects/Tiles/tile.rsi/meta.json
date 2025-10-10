@@ -241,7 +241,10 @@
       "name": "silver"
     },
     {
-      "name": "techfloor"
+       "name": "techfloor"
+    },
+    {
+       "name": "techfloordark"
     },
     {
       "name": "white"

@@ -41,7 +41,6 @@ public sealed partial class ShuttleSystem : SharedShuttleSystem
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
     [Dependency] private readonly IRobustRandom _random = default!;
-    [Dependency] private readonly ITileDefinitionManager _tileDefManager = default!;
     [Dependency] private readonly BiomeSystem _biomes = default!;
     [Dependency] private readonly BodySystem _bobby = default!;
     [Dependency] private readonly BuckleSystem _buckle = default!;
