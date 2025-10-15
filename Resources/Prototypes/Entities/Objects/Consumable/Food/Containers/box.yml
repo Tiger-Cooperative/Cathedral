@@ -647,14 +647,14 @@
           - id: ToyAi
           - id: ToyNuke
           - id: ToyFigurinePassenger
-          - id: ToyGriffin
+          - id: ToyFigurineGriffin
           - id: ToyHonk
           - id: ToyIan
           - id: ToyMarauder
           - id: ToyMauler
           - id: ToyGygax
           - id: ToyOdysseus
-          - id: ToyOwlman
+          - id: ToyFigurineOwlman
           - id: ToyDeathRipley
           - id: ToyPhazon
           - id: ToyFireRipley
@@ -662,7 +662,7 @@
           - id: ToyRipley
           - id: ToySeraph
           - id: ToyDurand
-          - id: ToySkeleton
+          - id: ToyFigurineSkeleton
           - id: FoamBlade
           - id: ClothingHeadHatBunny
           - id: PersonalAI
@@ -708,14 +708,14 @@
     - id: ToyAi
     - id: ToyNuke
     - id: ToyFigurinePassenger
-    - id: ToyGriffin
+    - id: ToyFigurineGriffin
     - id: ToyHonk
     - id: ToyIan
     - id: ToyMarauder
     - id: ToyMauler
     - id: ToyGygax
     - id: ToyOdysseus
-    - id: ToyOwlman
+    - id: ToyFigurineOwlman
     - id: ToyDeathRipley
     - id: ToyPhazon
     - id: ToyFireRipley
@@ -723,7 +723,7 @@
     - id: ToyRipley
     - id: ToySeraph
     - id: ToyDurand
-    - id: ToySkeleton
+    - id: ToyFigurineSkeleton
     - id: FoamBlade
     - id: ClothingHeadHatBunny
     - id: PersonalAI

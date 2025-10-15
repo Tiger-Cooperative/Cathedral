@@ -1411,9 +1411,6 @@
   id: ToyRubberDuck # ConstructionGraph: ClothingShoeSlippersDuck
 
 - type: Tag
-  id: ToyRubberDuck # ConstructionGraph: ClothingShoeSlippersDuck
-
-- type: Tag
   id: ToySidearm # Storage whitelist: ClothingShoesClownBase
 
 - type: Tag
