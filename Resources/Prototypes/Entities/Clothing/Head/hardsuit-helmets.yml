@@ -166,6 +166,7 @@
     radius: 7
     energy: 3
 
+#Goliath Hardsuit
 - type: entity
   parent: [ ClothingHeadHardsuitBase, ClothingHeadSuitWithLightBase ]
   id: ClothingHeadHelmetHardsuitGoliath
@@ -208,6 +209,7 @@
     highPressureMultiplier: 0.72
     lowPressureMultiplier: 1000
 
+#Maxim Hardsuit
 - type: entity
   parent: ClothingHeadHardsuitBase
   id: ClothingHeadHelmetHardsuitMaxim
@@ -802,6 +804,10 @@
       head:
       - state: equipped-head
       - state: equipped-head-unshaded
+        shader: unshaded
+      head-vox:
+      - state: equipped-head-vox
+      - state: equipped-head-unshaded-vox
         shader: unshaded
   - type: PointLight
     color: orange

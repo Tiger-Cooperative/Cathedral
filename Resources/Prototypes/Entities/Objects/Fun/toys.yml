@@ -873,6 +873,7 @@
     delay: 0.8
   - type: Slippery
     staminaDamage: 0
+    frictionStatusTime: 0
     slipData:
       stunTime: 0
       knockdownTime: 0
@@ -892,7 +893,7 @@
   - type: StepTrigger
     intersectRatio: 0.2
     requiredTriggeredSpeed: 2
-  - type: TriggerOnStepTrigger
+  - type: TriggerOnStepTrigger # for payloads
   - type: Appearance
   - type: CollisionWake
     enabled: false
