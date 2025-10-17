@@ -1,6 +1,7 @@
 using Content.Shared.Climbing.Components;
 using Content.Shared.Climbing.Systems;
 using Content.Shared.Hands.Components;
+using Content.Shared.Inventory;
 using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
@@ -26,7 +27,6 @@ public sealed class StandingStateSystem : EntitySystem
         base.Initialize();
         SubscribeLocalEvent<StandingStateComponent, AttemptMobCollideEvent>(OnMobCollide);
         SubscribeLocalEvent<StandingStateComponent, AttemptMobTargetCollideEvent>(OnMobTargetCollide);
-        SubscribeLocalEvent<StandingStateComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshMovementSpeedModifiers);
         SubscribeLocalEvent<StandingStateComponent, RefreshFrictionModifiersEvent>(OnRefreshFrictionModifiers);
         SubscribeLocalEvent<StandingStateComponent, TileFrictionEvent>(OnTileFriction);
     }
@@ -47,33 +47,32 @@ public sealed class StandingStateSystem : EntitySystem
         }
     }
 
-    private void OnRefreshMovementSpeedModifiers(Entity<StandingStateComponent> entity, ref RefreshMovementSpeedModifiersEvent args)
-    {
-        if (!entity.Comp.Standing)
-            args.ModifySpeed(entity.Comp.FrictionModifier);
-    }
-
     private void OnRefreshFrictionModifiers(Entity<StandingStateComponent> entity, ref RefreshFrictionModifiersEvent args)
     {
         if (entity.Comp.Standing)
             return;
 
-        args.ModifyFriction(entity.Comp.FrictionModifier);
-        args.ModifyAcceleration(entity.Comp.FrictionModifier);
+        args.ModifyFriction(entity.Comp.DownFrictionMod);
+        args.ModifyAcceleration(entity.Comp.DownFrictionMod);
     }
 
     private void OnTileFriction(Entity<StandingStateComponent> entity, ref TileFrictionEvent args)
     {
         if (!entity.Comp.Standing)
-            args.Modifier *= entity.Comp.FrictionModifier;
+            args.Modifier *= entity.Comp.DownFrictionMod;
     }
 
-    public bool IsDown(EntityUid uid, StandingStateComponent? standingState = null)
+    public bool IsMatchingState(Entity<StandingStateComponent?> entity, bool standing)
     {
-        if (!Resolve(uid, ref standingState, false))
+        return standing != IsDown(entity);
+    }
+
+    public bool IsDown(Entity<StandingStateComponent?> entity)
+    {
+        if (!Resolve(entity, ref entity.Comp, false))
             return false;
 
-        return !standingState.Standing;
+        return !entity.Comp.Standing;
     }
 
     public bool Down(EntityUid uid,
@@ -214,29 +213,27 @@ public record struct DropHandItemsEvent();
 /// <summary>
 /// Subscribe if you can potentially block a down attempt.
 /// </summary>
-public sealed class DownAttemptEvent : CancellableEntityEventArgs
-{
-}
+public sealed class DownAttemptEvent : CancellableEntityEventArgs;
 
 /// <summary>
 /// Subscribe if you can potentially block a stand attempt.
 /// </summary>
-public sealed class StandAttemptEvent : CancellableEntityEventArgs
-{
-}
+public sealed class StandAttemptEvent : CancellableEntityEventArgs;
 
 /// <summary>
 /// Raised when an entity becomes standing
 /// </summary>
-public sealed class StoodEvent : EntityEventArgs
+public sealed class StoodEvent : EntityEventArgs, IInventoryRelayEvent
 {
-}
+    public SlotFlags TargetSlots { get; } = SlotFlags.FEET;
+};
 
 /// <summary>
 /// Raised when an entity is not standing
 /// </summary>
-public sealed class DownedEvent : EntityEventArgs
+public sealed class DownedEvent : EntityEventArgs, IInventoryRelayEvent
 {
+    public SlotFlags TargetSlots { get; } = SlotFlags.FEET;
 }
 
 /// <summary>

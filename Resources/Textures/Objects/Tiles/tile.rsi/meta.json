@@ -567,6 +567,9 @@
             "name": "asteroid-inhand-left",
             "directions": 4
         },
+        {
+            "name": "xenoborg-floor"
+        },
 	{
 	    "name": "white-marble"
 	},
