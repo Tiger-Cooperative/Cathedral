@@ -7,6 +7,8 @@ using Content.Shared.GameTicking;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Inventory;
+using Content.Shared.Localizations;
+using Content.Shared.Lock;
 using Content.Shared.NameIdentifier;
 using Content.Shared.PDA;
 using Content.Shared.StationRecords;
@@ -39,6 +41,8 @@ public sealed class AccessReaderSystem : EntitySystem
 
         SubscribeLocalEvent<AccessReaderComponent, GotEmaggedEvent>(OnEmagged);
         SubscribeLocalEvent<AccessReaderComponent, LinkAttemptEvent>(OnLinkAttempt);
+        SubscribeLocalEvent<AccessReaderComponent, FindAvailableLocksEvent>(OnFindAvailableLocks);
+        SubscribeLocalEvent<AccessReaderComponent, CheckUserHasLockAccessEvent>(OnCheckLockAccess);
 
         SubscribeLocalEvent<AccessReaderComponent, ComponentGetState>(OnGetState);
         SubscribeLocalEvent<AccessReaderComponent, ComponentHandleState>(OnHandleState);
@@ -98,6 +102,22 @@ public sealed class AccessReaderSystem : EntitySystem
         accessReader.Value.Comp.AccessLists.Clear();
         accessReader.Value.Comp.AccessLog.Clear();
         Dirty(uid, reader);
+    }
+
+    private void OnFindAvailableLocks(Entity<AccessReaderComponent> ent, ref FindAvailableLocksEvent args)
+    {
+        args.FoundReaders |= LockTypes.Access;
+    }
+
+    private void OnCheckLockAccess(Entity<AccessReaderComponent> ent, ref CheckUserHasLockAccessEvent args)
+    {
+        // Are we looking for an access lock?
+        if (!args.FoundReaders.HasFlag(LockTypes.Access))
+            return;
+
+        // If the user has access to this lock, we pass it into the event.
+        if (IsAllowed(args.User, ent))
+            args.HasAccess |= LockTypes.Access;
     }
 
     /// <summary>
