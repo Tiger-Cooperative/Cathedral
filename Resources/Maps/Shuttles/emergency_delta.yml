@@ -12,8 +12,6 @@ grids:
 orphans:
 - 1
 nullspace: []
-  format: 6
-  postmapinit: false
 tilemap:
   0: Space
   29: FloorDark
