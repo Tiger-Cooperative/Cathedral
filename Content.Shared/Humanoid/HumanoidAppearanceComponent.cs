@@ -60,6 +60,9 @@ public sealed partial class HumanoidAppearanceComponent : Component
     [DataField, AutoNetworkedField]
     public Color SkinColor { get; set; } = Color.FromHex("#C0967F");
 
+    [DataField, AutoNetworkedField]
+    public (float, float) Dimensions { get; set; } = (1f, 1f);
+
     /// <summary>
     ///     A map of the visual layers currently hidden to the equipment
     ///     slots that are currently hiding them. This will affect the base

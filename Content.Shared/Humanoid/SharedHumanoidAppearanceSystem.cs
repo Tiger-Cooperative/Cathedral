@@ -151,6 +151,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
 
         targetHumanoid.Species = sourceHumanoid.Species;
         targetHumanoid.SkinColor = sourceHumanoid.SkinColor;
+        targetHumanoid.Dimensions = sourceHumanoid.Dimensions;
         targetHumanoid.EyeColor = sourceHumanoid.EyeColor;
         targetHumanoid.Age = sourceHumanoid.Age;
         targetHumanoid.CustomBaseLayers = new(sourceHumanoid.CustomBaseLayers);
@@ -395,6 +396,7 @@ public abstract class SharedHumanoidAppearanceSystem : EntitySystem
         SetSpecies(uid, profile.Species, false, humanoid);
         SetSex(uid, profile.Sex, false, humanoid);
         humanoid.EyeColor = profile.Appearance.EyeColor;
+        humanoid.Dimensions = profile.Appearance.Dimensions;
 
         SetSkinColor(uid, profile.Appearance.SkinColor, false);
 

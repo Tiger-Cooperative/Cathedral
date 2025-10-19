@@ -60,6 +60,12 @@ public sealed partial class SpeciesPrototype : IPrototype
     public int DefaultHumanSkinTone { get; private set; } = 20;
 
     /// <summary>
+    /// Default dimensions for this species. With this, they can be larger or smaller on average.
+    /// </summary>
+    [DataField]
+    public float DefaultScale { get; private set; } = 1.00f;
+
+    /// <summary>
     ///     The limit of body markings that you can place on this species.
     /// </summary>
     [DataField("markingLimits")]

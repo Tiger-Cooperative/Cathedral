@@ -9,6 +9,7 @@ using Robust.Client.GameObjects;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+using System.Numerics;
 
 namespace Content.Client.Humanoid;
 
@@ -52,6 +53,7 @@ public sealed class HumanoidAppearanceSystem : SharedHumanoidAppearanceSystem
         var sprite = entity.Comp2;
 
         sprite[_sprite.LayerMapReserve((entity.Owner, sprite), HumanoidVisualLayers.Eyes)].Color = humanoidAppearance.EyeColor;
+        _sprite.SetScale(entity.Owner, new Vector2(humanoidAppearance.Dimensions.Item1, humanoidAppearance.Dimensions.Item2));
     }
 
     private static bool IsHidden(HumanoidAppearanceComponent humanoid, HumanoidVisualLayers layer)
@@ -222,6 +224,7 @@ public sealed class HumanoidAppearanceSystem : SharedHumanoidAppearanceSystem
         humanoid.Age = profile.Age;
         humanoid.Species = profile.Species;
         humanoid.SkinColor = profile.Appearance.SkinColor;
+        humanoid.Dimensions = profile.Appearance.Dimensions;
         humanoid.EyeColor = profile.Appearance.EyeColor;
 
         UpdateSprite((uid, humanoid, Comp<SpriteComponent>(uid)));

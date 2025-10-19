@@ -5,6 +5,7 @@
   prototype: MobMoth
   sprites: MobMothSprites
   defaultSkinTone: "#ffda93"
+  defaultScale: 0.9
   markingLimits: MobMothMarkingLimits
   dollPrototype: MobMothDummy
   skinColoration: Hues
