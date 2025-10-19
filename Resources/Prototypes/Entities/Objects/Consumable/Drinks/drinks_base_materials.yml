@@ -124,7 +124,6 @@
   components:
   - type: Damageable
     damageContainer: Inorganic
-    damageModifierSet: Card
   - type: Destructible
     thresholds:
     - trigger: # Overkill threshold
