@@ -7,7 +7,6 @@
     sprite: Structures/Wallmounts/posters.rsi
   - type: Damageable
     damageContainer: StructuralInorganic
-    damageModifierSet: Card
   - type: Destructible
     thresholds:
     - trigger: # Excess damage, don't spawn entities

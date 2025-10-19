@@ -1133,6 +1133,7 @@
       path: /Audio/Voice/Human/malescream_4.ogg
       params:
         volume: -8
+  - type: Edible
     useSound:
       path: /Audio/Voice/Human/malescream_1.ogg
       params:
