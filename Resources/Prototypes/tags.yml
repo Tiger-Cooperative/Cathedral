@@ -632,6 +632,9 @@
   id: GhostOnlyWarp
 
 - type: Tag
+  id: GenderPin
+
+- type: Tag
   id: GlassAirlock
 
 - type: Tag
@@ -1328,6 +1331,9 @@
 
 - type: Tag
   id: StationAi
+
+- type: Tag
+  id: StationAiCoreElectronics
 
 - type: Tag
   id: StationMapElectronics
