@@ -350,6 +350,8 @@
     sound: *PlushieLizardSound
   - type: EmitSoundOnCollide
     sound: *PlushieLizardSound
+  - type: Edible
+    useSound: *PlushieLizardSound
   - type: MeleeWeapon
     soundHit: *PlushieLizardSound
   - type: Extractable
@@ -413,6 +415,8 @@
     sound: *PlushieExperimentSound
   - type: EmitSoundOnCollide
     sound: *PlushieExperimentSound
+  - type: Edible
+    useSound: *PlushieExperimentSound
   - type: MeleeWeapon
     soundHit: *PlushieExperimentSound
   - type: Clothing
@@ -493,6 +497,8 @@
     sound: *PlushieSpaceLizardSound
   - type: EmitSoundOnCollide
     sound: *PlushieSpaceLizardSound
+  - type: Edible
+    useSound: *PlushieSpaceLizardSound
   - type: MeleeWeapon
     soundHit: *PlushieSpaceLizardSound
   - type: Clothing
@@ -531,6 +537,8 @@
     sound: *PlushieLizardInversedSound
   - type: EmitSoundOnTrigger
     sound: *PlushieLizardInversedSound
+  - type: Edible
+    useSound: *PlushieLizardInversedSound
   - type: MeleeWeapon
     soundHit: *PlushieLizardInversedSound
   - type: Extractable
@@ -584,6 +592,8 @@
     sound: *PlushieDionaSound
   - type: EmitSoundOnCollide
     sound: *PlushieDionaSound
+  - type: Edible
+    useSound: *PlushieDionaSound
   - type: MeleeWeapon
     soundHit: *PlushieDionaSound
   - type: SolutionContainerManager
@@ -659,12 +669,12 @@
     sound: *PlushieSharkSound
   - type: EmitSoundOnCollide
     sound: *PlushieSharkSound
+  - type: Edible
+    useSound: *PlushieSharkSound
   - type: MeleeWeapon
     wideAnimationRotation: 90
     soundHit: *PlushieSharkSound
     animation: WeaponArcBite
-  - type: Edible
-    useSound: *PlushieSharkSound
   - type: Item
     heldPrefix: blue
     storedRotation: -90
@@ -889,10 +899,10 @@
     sound: *PlushieSlimeSound
   - type: EmitSoundOnTrigger
     sound: *PlushieSlimeSound
-  - type: MeleeWeapon
-    soundHit: *PlushieSlimeSound
   - type: Edible
     useSound: *PlushieSlimeSound
+  - type: MeleeWeapon
+    soundHit: *PlushieSlimeSound
   - type: Clothing
     quickEquip: false
     sprite: Objects/Fun/Plushies/slime.rsi
@@ -996,6 +1006,8 @@
     sound: *PlushieVoxSound
   - type: EmitSoundOnCollide
     sound: *PlushieVoxSound
+  - type: Edible
+    useSound: *PlushieVoxSound
   - type: MeleeWeapon
     soundHit: *PlushieVoxSound
   - type: Clothing
@@ -1057,6 +1069,8 @@
     sound: *PlushieXenoSound
   - type: EmitSoundOnCollide
     sound: *PlushieXenoSound
+  - type: Edible
+    useSound: *PlushieXenoSound
   - type: MeleeWeapon
     soundHit: *PlushieXenoSound
   - type: Clothing
@@ -1162,10 +1176,10 @@
     sound: *PlushieMothSound
   - type: EmitSoundOnCollide
     sound: *PlushieMothSound
-  - type: MeleeWeapon
-    soundHit: *PlushieMothSound
   - type: Edible
     useSound: *PlushieMothSound
+  - type: MeleeWeapon
+    soundHit: *PlushieMothSound
   - type: Clothing
     quickEquip: false
     sprite: Objects/Fun/Plushies/moth.rsi
