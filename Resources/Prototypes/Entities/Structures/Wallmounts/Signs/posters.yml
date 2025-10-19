@@ -5,6 +5,8 @@
   components:
   - type: Sprite
     sprite: Structures/Wallmounts/posters.rsi
+  - type: Damageable
+    damageContainer: StructuralInorganic
   - type: Destructible
     thresholds:
     - trigger: # Excess damage, don't spawn entities
@@ -18,7 +20,7 @@
         acts: ["Destruction"]
     - trigger:
         !type:DamageTrigger
-        damage: 5
+        damage: 15
       behaviors:
       - !type:PlaySoundBehavior
         sound:
