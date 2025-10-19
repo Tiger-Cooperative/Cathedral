@@ -43,7 +43,7 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
             return;
 
         if (component.EmpContinuous)
-            component.NextEmpChange = _timing.CurTime + TimeSpan.FromSeconds(1f / component.EmpChangeIntensity);
+            component.NextEmpChange = Timing.CurTime + TimeSpan.FromSeconds(1f / component.EmpChangeIntensity);
 
         var pick = GetRandomValidPrototype(component.Slot, component.RequireTag);
         SetSelectedPrototype(uid, pick, component: component);
@@ -106,7 +106,7 @@ public sealed class ChameleonClothingSystem : SharedChameleonClothingSystem
             if (!chameleon.EmpContinuous)
                 continue;
 
-            if (_timing.CurTime < chameleon.NextEmpChange)
+            if (Timing.CurTime < chameleon.NextEmpChange)
                 continue;
 
             // randomly pick cloth element from available and apply it
