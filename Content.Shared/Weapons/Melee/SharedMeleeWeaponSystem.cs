@@ -12,12 +12,13 @@ using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
 using Content.Shared.FixedPoint;
 using Content.Shared.Hands;
-using Content.Shared.Hands.Components;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.VirtualItem;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Popups;
 using Content.Shared.Weapons.Melee.Components;
@@ -53,10 +54,11 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
     [Dependency] private   readonly SharedAudioSystem _audio = default!;
     [Dependency] protected readonly SharedCombatModeSystem CombatMode = default!;
     [Dependency] protected readonly SharedInteractionSystem Interaction = default!;
-    [Dependency] private readonly SharedPhysicsSystem _physics = default!;
+    [Dependency] private   readonly SharedPhysicsSystem _physics = default!;
     [Dependency] protected readonly SharedPopupSystem PopupSystem = default!;
     [Dependency] protected readonly SharedTransformSystem TransformSystem = default!;
     [Dependency] private   readonly SharedStaminaSystem _stamina = default!;
+    [Dependency] private   readonly MovementModStatusSystem _slow = default!;
 
     protected const int AttackMask = (int) (CollisionGroup.MobMask | CollisionGroup.Opaque);
 
@@ -814,7 +816,7 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
             || !InRange(user, target.Value, comp.Range, session)
             || Deleted(target)
             || !TryComp<StaminaComponent>(target, out var stamina)
-            || !TryComp<TransformComponent>(target, out var targetXform)
+            || !HasComp<TransformComponent>(target)
             || MobState.IsIncapacitated(target.Value)
             || stamina.Critical
             || !TryComp<CombatModeComponent>(user, out var combatMode)
@@ -839,13 +841,7 @@ public abstract class SharedMeleeWeaponSystem : EntitySystem
         {
             // Making this not use inbuilt color flash and manually doing it is definitely an odd workaround, but I'm not sure how else I would reasonably make the flash predicted.
             _stamina.TakeStaminaDamage(target.Value, attemptEvent.StaminaDamage, visual: false);
-            // TrySlowdown is perhaps the MOST annoying function I have ever had the displeasure of using.
-            // I'll revisit this.
-            //if (TryComp<StatusEffectsComponent>(target.Value, out var status))
-            //{
-            //    var time = TimeSpan.FromSeconds(15);
-            //    _stuns.TrySlowdown(target.Value, time, true, 0.85f, 0.85f, status);
-            //}
+            _slow.TryUpdateMovementSpeedModDuration(target.Value, MovementModStatusSystem.ShoveSlowdown, TimeSpan.FromSeconds(2), 0.85f);
             DoDamageEffect(new List<EntityUid> { target.Value }, user, Transform(target.Value), true);
             _audio.PlayPredicted(combatMode.ShoveSuccessSound, target.Value, user, AudioParams.Default.WithVariation(0.025f).WithVolume(5f));
 
