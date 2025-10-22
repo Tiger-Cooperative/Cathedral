@@ -191,6 +191,12 @@
   maxCount: 30
 
 - type: stack
+  id: FloorTileTechmaintDark
+  name: stack-techmaint-floor-dark
+  spawn: FloorTileItemTechmaintDark
+  maxCount: 30
+
+- type: stack
   id: FloorTileFreezer
   name: stack-freezer-tile
   spawn: FloorTileItemFreezer
@@ -612,6 +618,18 @@
   maxCount: 30
 
 - type: stack
+  id: FloorTileDarkAstroGrass
+  name: stack-dark-astro-grass-floor
+  spawn: FloorTileItemDarkAstroGrass
+  maxCount: 30
+
+- type: stack
+  id: FloorTileLightAstroGrass
+  name: stack-light-astro-grass-floor
+  spawn: FloorTileItemLightAstroGrass
+  maxCount: 30
+
+- type: stack
   id: FloorTileAstroIce
   name: stack-astro-ice-floor
   spawn: FloorTileItemAstroIce
@@ -630,7 +648,43 @@
   maxCount: 30
 
 - type: stack
+  id: FloorTileDesertAstroSand
+  name: stack-desert-astro-sand-floor
+  spawn: FloorTileItemDesertAstroSand
+  maxCount: 30
+
+- type: stack
   id: FloorTileWoodLarge
   name: stack-large-wood-floor
   spawn: FloorTileItemWoodLarge
+  maxCount: 30
+
+- type: stack
+  id: FloorTileXenoborg
+  name: stack-xenoborg
+  spawn: FloorTileItemXenoborg
+  maxCount: 30
+
+- type: stack
+  id: FloorTileWhiteMarble
+  name: stack-white-marble-floor
+  spawn: FloorTileItemWhiteMarble
+  maxCount: 30
+
+- type: stack
+  id: FloorTileDarkMarble
+  name: stack-dark-marble-floor
+  spawn: FloorTileItemDarkMarble
+  maxCount: 30
+
+- type: stack
+  id: FloorTilePlasmaMarble
+  name: stack-plasma-marble-floor
+  spawn: FloorTileItemPlasmaMarble
+  maxCount: 30
+
+- type: stack
+  id: FloorTileUraniumMarble
+  name: stack-uranium-marble-floor
+  spawn: FloorTileItemUraniumMarble
   maxCount: 30

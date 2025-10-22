@@ -30,15 +30,17 @@ namespace Content.Client.Construction.UI
         [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
         [Dependency] private readonly IPlayerManager _playerManager = default!;
         [Dependency] private readonly IClientPreferencesManager _preferencesManager = default!;
-        private readonly SpriteSystem _spriteSystem;
+        [Dependency] private readonly ILogManager _logManager = default!;
 
+        private readonly ISawmill _sawmill = default!;
+        private readonly SpriteSystem _spriteSystem;
         private readonly IConstructionMenuView _constructionView;
         private readonly EntityWhitelistSystem _whitelistSystem;
 
         private ConstructionSystem? _constructionSystem;
         private ConstructionPrototype? _selected;
         private List<ConstructionPrototype> _favoritedRecipes = [];
-        private Dictionary<string, ContainerButton> _recipeButtons = new();
+        private readonly Dictionary<string, ContainerButton> _recipeButtons = new();
         private string _selectedCategory = string.Empty;
 
         private const string FavoriteCatName = "construction-category-favorites";
@@ -87,6 +89,8 @@ namespace Content.Client.Construction.UI
         {
             // This is a lot easier than a factory
             IoCManager.InjectDependencies(this);
+            _sawmill = _logManager.GetSawmill("construction.menu");
+
             _constructionView = new ConstructionMenu();
             _whitelistSystem = _entManager.System<EntityWhitelistSystem>();
             _spriteSystem = _entManager.System<SpriteSystem>();
@@ -217,8 +221,8 @@ namespace Content.Client.Construction.UI
                 var itemButton = new ContainerButton()
                 {
                     VerticalAlignment = Control.VAlignment.Center,
-                    Name = recipe.TargetPrototype.Name,
-                    ToolTip = recipe.TargetPrototype.Name,
+                    Name = recipe.Prototype.Name,
+                    ToolTip = recipe.Prototype.Name,
                     ToggleMode = true,
                     Children = { protoView },
                 };
@@ -235,7 +239,7 @@ namespace Content.Client.Construction.UI
 
                     if (buttonToggledEventArgs.Pressed &&
                         _selected != null &&
-                        _recipeButtons.TryGetValue(_selected.Name!, out var oldButton))
+                        _recipeButtons.TryGetValue(_selected.ID, out var oldButton))
                     {
                         oldButton.Pressed = false;
                         SelectGridButton(oldButton, false);
@@ -245,7 +249,7 @@ namespace Content.Client.Construction.UI
                 };
 
                 recipesGrid.AddChild(itemButtonPanelContainer);
-                _recipeButtons[recipe.Prototype.Name!] = itemButton;
+                _recipeButtons[recipe.Prototype.ID] = itemButton;
                 var isCurrentButtonSelected = _selected == recipe.Prototype;
                 itemButton.Pressed = isCurrentButtonSelected;
                 SelectGridButton(itemButton, isCurrentButtonSelected);
@@ -284,7 +288,7 @@ namespace Content.Client.Construction.UI
 
                 if (!_constructionSystem!.TryGetRecipePrototype(recipe.ID, out var targetProtoId))
                 {
-                    Logger.Error("Cannot find the target prototype in the recipe cache with the id \"{0}\" of {1}.",
+                    _sawmill.Error("Cannot find the target prototype in the recipe cache with the id \"{0}\" of {1}.",
                         recipe.ID,
                         nameof(ConstructionPrototype));
                     continue;
@@ -307,7 +311,7 @@ namespace Content.Client.Construction.UI
             if (button.Parent is not PanelContainer buttonPanel)
                 return;
 
-            button.Modulate = select ? Color.Green : Color.Transparent;
+            button.Children.Single().Modulate = select ? Color.Green : Color.White;
             var buttonColor = select ? StyleNano.ButtonColorDefault : Color.Transparent;
             buttonPanel.PanelOverride = new StyleBoxFlat { BackgroundColor = buttonColor };
         }
@@ -510,7 +514,7 @@ namespace Content.Client.Construction.UI
 
             foreach (var id in favorites)
             {
-                if (_prototypeManager.TryIndex(id, out ConstructionPrototype? recipe, logError: false))
+                if (_prototypeManager.TryIndex(id, out ConstructionPrototype? recipe))
                     _favoritedRecipes.Add(recipe);
             }
 

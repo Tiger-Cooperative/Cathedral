@@ -114,12 +114,12 @@ namespace Content.Server.Voting
                 {
                     var ties = string.Join(", ", eventArgs.Winners.Select(c => args[(int) c]));
                     _adminLogger.Add(LogType.Vote, LogImpact.Medium, $"Custom vote {options.Title} finished as tie: {ties}");
-                    _chatManager.DispatchServerAnnouncement(Loc.GetString("cmd-customvote-on-finished-tie", ("ties", ties)));
+                    _chatManager.DispatchServerAnnouncement(Loc.GetString("cmd-customvote-on-finished-tie", ("title", options.Title), ("ties", ties)));
                 }
                 else
                 {
                     _adminLogger.Add(LogType.Vote, LogImpact.Medium, $"Custom vote {options.Title} finished: {args[(int) eventArgs.Winner]}");
-                    _chatManager.DispatchServerAnnouncement(Loc.GetString("cmd-customvote-on-finished-win", ("winner", args[(int) eventArgs.Winner])));
+                    _chatManager.DispatchServerAnnouncement(Loc.GetString("cmd-customvote-on-finished-win", ("title", options.Title), ("winner", args[(int) eventArgs.Winner])));
                 }
 
                 _voteWebhooks.UpdateWebhookIfConfigured(webhookState, eventArgs);
@@ -249,10 +249,9 @@ namespace Content.Server.Voting
 
         public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
         {
-            var mgr = IoCManager.Resolve<IVoteManager>();
             if (args.Length == 1)
             {
-                var options = mgr.ActiveVotes
+                var options = _voteManager.ActiveVotes
                     .OrderBy(v => v.Id)
                     .Select(v => new CompletionOption(v.Id.ToString(), v.Title));
 

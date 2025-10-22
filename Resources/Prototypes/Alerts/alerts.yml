@@ -24,6 +24,7 @@
     - category: Hunger
     - category: Thirst
     - alertType: Magboots
+    - alertType: Rooted
     - alertType: Pacified
 
 - type: entity
@@ -143,6 +144,15 @@
     state: stunbaton_off
   name: alerts-stunned-name
   description: alerts-stunned-desc
+
+- type: alert
+  id: Knockdown
+  clickEvent: !type:KnockedDownAlertEvent
+  icons:
+  - sprite: /Textures/Interface/Alerts/stunnable.rsi
+    state: knocked-down
+  name: alerts-knockdown-name
+  description: alerts-knockdown-desc
 
 - type: alert
   id: Handcuffed
@@ -302,7 +312,9 @@
   id: PilotingShuttle
   category: Piloting
   clickEvent: !type:StopPilotingAlertEvent
-  icons: [ /Textures/Interface/Alerts/piloting.png ]
+  icons:
+  - sprite: /Textures/Interface/Alerts/shuttle.rsi
+    state: piloting
   name: alerts-piloting-name
   description: alerts-piloting-desc
 
