@@ -38,7 +38,7 @@
       - type: MeleeWeapon
         animation: WeaponArcPunch
         wideAnimation: WeaponArcPunch
-        altDisarm: false
+        altShove: false
         soundHit: /Audio/Weapons/smash.ogg
         range: 1.2
         angle: 0.0

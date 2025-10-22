@@ -148,7 +148,7 @@
   - type: AnimationPlayer
   - type: Buckle
   - type: CombatMode
-    canDisarm: true
+    canShove: true
   - type: MeleeWeapon
     soundHit:
       collection: Punch

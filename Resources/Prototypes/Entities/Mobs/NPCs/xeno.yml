@@ -70,7 +70,7 @@
     bloodReagent: FluorosulfuricAcid
     bloodMaxVolume: 650
   - type: MeleeWeapon
-    altDisarm: false
+    altShove: false
     angle: 0
     soundHit:
      collection: AlienClaw

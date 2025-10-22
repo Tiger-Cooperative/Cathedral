@@ -155,7 +155,7 @@ public sealed partial class ZombieSystem
         //in an attempt to make an entity not attack. This is the easiest way to do it.
         var combat = EnsureComp<CombatModeComponent>(target);
         RemComp<PacifiedComponent>(target);
-        _combat.SetCanDisarm(target, false, combat);
+        _combat.SetCanShove(target, false, combat);
         _combat.SetInCombatMode(target, true, combat);
 
         //This is the actual damage of the zombie. We assign the visual appearance
@@ -163,7 +163,7 @@ public sealed partial class ZombieSystem
         var melee = EnsureComp<MeleeWeaponComponent>(target);
         melee.Animation = zombiecomp.AttackAnimation;
         melee.WideAnimation = zombiecomp.AttackAnimation;
-        melee.AltDisarm = false;
+        melee.AltShove = false;
         melee.Range = 1.2f;
         melee.Angle = 0.0f;
         melee.HitSound = zombiecomp.BiteSound;
@@ -172,7 +172,7 @@ public sealed partial class ZombieSystem
         [
             nameof(MeleeWeaponComponent.Animation),
             nameof(MeleeWeaponComponent.WideAnimation),
-            nameof(MeleeWeaponComponent.AltDisarm),
+            nameof(MeleeWeaponComponent.AltShove),
             nameof(MeleeWeaponComponent.Range),
             nameof(MeleeWeaponComponent.Angle),
             nameof(MeleeWeaponComponent.HitSound),

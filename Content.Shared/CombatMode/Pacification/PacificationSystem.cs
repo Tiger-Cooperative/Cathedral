@@ -72,14 +72,14 @@ public sealed class PacificationSystem : EntitySystem
 
     private void OnAttackAttempt(EntityUid uid, PacifiedComponent component, AttackAttemptEvent args)
     {
-        if (component.DisallowAllCombat || args.Disarm && component.DisallowDisarm)
+        if (component.DisallowAllCombat || args.Shove && component.DisallowShove)
         {
             args.Cancel();
             return;
         }
 
         // If it's a disarm, let it go through (unless we disallow them, which is handled earlier)
-        if (args.Disarm)
+        if (args.Shove)
             return;
 
         // Allow attacking with no target. This should be fine.
@@ -103,8 +103,8 @@ public sealed class PacificationSystem : EntitySystem
         if (!TryComp<CombatModeComponent>(uid, out var combatMode))
             return;
 
-        if (component.DisallowDisarm && combatMode.CanDisarm != null)
-            _combatSystem.SetCanDisarm(uid, false, combatMode);
+        if (component.DisallowShove && combatMode.CanShove != null)
+            _combatSystem.SetCanShove(uid, false, combatMode);
 
         if (component.DisallowAllCombat)
         {
@@ -120,8 +120,8 @@ public sealed class PacificationSystem : EntitySystem
         if (!TryComp<CombatModeComponent>(uid, out var combatMode))
             return;
 
-        if (combatMode.CanDisarm != null)
-            _combatSystem.SetCanDisarm(uid, true, combatMode);
+        if (combatMode.CanShove != null)
+            _combatSystem.SetCanShove(uid, true, combatMode);
 
         _actionsSystem.SetEnabled(combatMode.CombatToggleActionEntity, true);
         _alertsSystem.ClearAlert(uid, component.PacifiedAlert);

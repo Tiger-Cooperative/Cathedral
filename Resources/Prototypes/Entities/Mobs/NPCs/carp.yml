@@ -61,7 +61,7 @@
           amount: 1
           maxAmount: 4
     - type: MeleeWeapon
-      altDisarm: false
+      altShove: false
       angle: 0
       animation: WeaponArcBite
       soundHit:

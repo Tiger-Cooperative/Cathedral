@@ -15,11 +15,13 @@ public sealed partial class MeleeWeaponComponent : Component
 {
     // TODO: This is becoming bloated as shit.
     // This should just be its own component for alt attacks.
+    // Rather than that, I plan to make pushing the default and secondary attack types (wideswings, thrusts, etc.) the component, at least for standard melee weapons.
+    // But wouldn't it make more sense to keep it all in the combat mode component?
     /// <summary>
-    /// Does this entity do a disarm on alt attack.
+    /// Does this entity shove something on alt attack.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public bool AltDisarm = true;
+    public bool AltShove = true;
 
     /// <summary>
     /// Should the melee weapon's damage stats be examinable.

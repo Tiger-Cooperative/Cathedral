@@ -49,12 +49,12 @@ public abstract class SharedCombatModeSystem : EntitySystem
         _popup.PopupClient(Loc.GetString(msg), args.Performer, args.Performer);
     }
 
-    public void SetCanDisarm(EntityUid entity, bool canDisarm, CombatModeComponent? component = null)
+    public void SetCanShove(EntityUid entity, bool canShove, CombatModeComponent? component = null)
     {
         if (!Resolve(entity, ref component))
             return;
 
-        component.CanDisarm = canDisarm;
+        component.CanShove = canShove;
     }
 
     public bool IsInCombatMode(EntityUid? entity, CombatModeComponent? component = null)

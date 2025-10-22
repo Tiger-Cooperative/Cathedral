@@ -22,6 +22,7 @@ public sealed class MovementModStatusSystem : EntitySystem
     public static readonly EntProtoId VomitingSlowdown = "VomitingSlowdownStatusEffect";
     public static readonly EntProtoId TaserSlowdown = "TaserSlowdownStatusEffect";
     public static readonly EntProtoId FlashSlowdown = "FlashSlowdownStatusEffect";
+    public static readonly EntProtoId ShoveSlowdown = "ShoveSlowdownStatusEffect";
     public static readonly EntProtoId StatusEffectFriction = "StatusEffectFriction";
 
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeedModifier = default!;

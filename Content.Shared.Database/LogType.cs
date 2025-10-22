@@ -111,9 +111,9 @@ public enum LogType
     CanisterTankInserted = 24,
 
     /// <summary>
-    /// A player tried to disarm an entity.
+    /// A player tried to shove an entity.
     /// </summary>
-    DisarmedAction = 25,
+    ShovedAction = 25,
 
     /// <summary>
     /// A player knocked down an entity on the floor.

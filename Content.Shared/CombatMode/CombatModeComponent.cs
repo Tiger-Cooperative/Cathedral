@@ -19,17 +19,17 @@ namespace Content.Shared.CombatMode
         #region Disarm
 
         /// <summary>
-        /// Whether we are able to disarm. This requires our active hand to be free.
+        /// Whether we are able to push. This requires our active hand to be free.
         /// False if it's toggled off for whatever reason, null if it's not possible.
         /// </summary>
-        [ViewVariables(VVAccess.ReadWrite), DataField("canDisarm")]
-        public bool? CanDisarm;
+        [ViewVariables(VVAccess.ReadWrite), DataField("canShove")]
+        public bool? CanShove;
 
-        [DataField("disarmSuccessSound")]
-        public SoundSpecifier DisarmSuccessSound = new SoundPathSpecifier("/Audio/Effects/thudswoosh.ogg");
+        [DataField("shoveSuccessSound")]
+        public SoundSpecifier ShoveSuccessSound = new SoundPathSpecifier("/Audio/Effects/thudswoosh.ogg");
 
-        [DataField("disarmFailChance")]
-        public float BaseDisarmFailChance = 0.75f;
+        [DataField("shoveStaminaDamage")]
+        public float ShoveStaminaDamage = 10f;
 
         #endregion
 
