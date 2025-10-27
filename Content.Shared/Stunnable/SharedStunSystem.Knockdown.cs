@@ -5,6 +5,7 @@ using Content.Shared.Climbing.Components;
 using Content.Shared.Climbing.Events;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Systems;
 using Content.Shared.Database;
 using Content.Shared.DoAfter;
 using Content.Shared.Gravity;
