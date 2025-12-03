@@ -72,7 +72,6 @@ public abstract partial class SharedStunSystem
         SubscribeLocalEvent<GravityAffectedComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
 
         // Handling Alternative Inputs
-        SubscribeAllEvent<ForceStandUpEvent>(OnForceStandup);
         SubscribeLocalEvent<KnockedDownComponent, KnockedDownAlertEvent>(OnKnockedDownAlert);
 
         CommandBinds.Builder
@@ -386,47 +385,13 @@ public abstract partial class SharedStunSystem
 
     }
 
-    private void OnForceStandup(ForceStandUpEvent msg, EntitySessionEventArgs args)
-    {
-        if (args.SenderSession.AttachedEntity is not {} user)
-            return;
-
-        ForceStandUp(user);
-    }
-
-    public void ForceStandUp(Entity<KnockedDownComponent?> entity)
-    {
-        if (!Resolve(entity, ref entity.Comp, false))
-            return;
-
-        // That way if we fail to stand, the game will try to stand for us when we are able to
-        SetAutoStand(entity, true);
-
-        if (StandingBlocked((entity, entity.Comp)))
-            return;
-
-        if (!_hands.TryGetEmptyHand(entity.Owner, out _))
-            return;
-
-        if (!TryForceStand(entity.Owner))
-            return;
-
-        // If we have a DoAfter, cancel it
-        CancelKnockdownDoAfter(entity);
-        // Remove Component
-        RemComp<KnockedDownComponent>(entity);
-
-        _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(entity):user} has force stood up from knockdown.");
-    }
-
     private void OnKnockedDownAlert(Entity<KnockedDownComponent> entity, ref KnockedDownAlertEvent args)
     {
         if (args.Handled)
             return;
 
         // If we're already trying to stand, or we fail to stand try forcing it
-        if (!TryStanding(entity.Owner))
-            ForceStandUp((entity.Owner, entity.Comp));
+        TryStanding(entity.Owner);
 
         args.Handled = true;
     }
