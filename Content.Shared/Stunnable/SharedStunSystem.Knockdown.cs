@@ -1,6 +1,8 @@
 using Content.Shared.Alert;
 using Content.Shared.Buckle.Components;
 using Content.Shared.CCVar;
+using Content.Shared.Climbing.Components;
+using Content.Shared.Climbing.Events;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.Database;
@@ -52,6 +54,7 @@ public abstract partial class SharedStunSystem
         // Action blockers
         SubscribeLocalEvent<KnockedDownComponent, BuckleAttemptEvent>(OnBuckleAttempt);
         SubscribeLocalEvent<KnockedDownComponent, StandAttemptEvent>(OnStandAttempt);
+        SubscribeLocalEvent<KnockedDownComponent, AttemptClimbEvent>(OnClimbAttempt);
 
         // Updating movement a friction
         SubscribeLocalEvent<KnockedDownComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshKnockedSpeed);
@@ -473,14 +476,15 @@ public abstract partial class SharedStunSystem
             if (!fixtureQuery.TryGetComponent(ent, out var fixtures))
                 continue;
 
-            if (!xformQuery.TryComp(ent, out var xformComp))
+            if (!xformQuery.TryComp(ent, out var xformComp) || HasComp<ClimbableComponent>(ent)
+                && TryComp<ClimbingComponent>(entity, out var climbing) && climbing.IsClimbing)
                 continue;
 
             var xform = new Transform(xformComp.LocalPosition, xformComp.LocalRotation);
 
             foreach (var fixture in fixtures.Fixtures.Values)
             {
-                if (!fixture.Hard || (fixture.CollisionMask & StandingStateSystem.StandingCollisionLayer) != StandingStateSystem.StandingCollisionLayer)
+                if (!fixture.Hard || (fixture.CollisionLayer & StandingStateSystem.StandingCollisionLayer) != StandingStateSystem.StandingCollisionLayer)
                     continue;
 
                 for (var i = 0; i < fixture.Shape.ChildCount; i++)
@@ -555,6 +559,15 @@ public abstract partial class SharedStunSystem
     {
         if (args.User == entity && entity.Comp.NextUpdate > GameTiming.CurTime)
             args.Cancelled = true;
+    }
+
+    private void OnClimbAttempt(Entity<KnockedDownComponent> entity, ref AttemptClimbEvent args)
+    {
+        if (args.User == entity.Owner)
+        {
+            args.Cancelled = true;
+            _popup.PopupClient(Loc.GetString("knockdown-component-climb-failure"), entity, entity);
+        }
     }
 
     #endregion

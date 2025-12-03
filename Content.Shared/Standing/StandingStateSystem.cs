@@ -122,17 +122,20 @@ public sealed class StandingStateSystem : EntitySystem
         // Change collision masks to allow going under certain entities like flaps and tables
         if (TryComp(uid, out FixturesComponent? fixtureComponent))
         {
+
             foreach (var (key, fixture) in fixtureComponent.Fixtures)
             {
-                if ((fixture.CollisionMask & StandingCollisionLayer) == 0
-                    // Slightly hacky, but makes sure that people are able to properly stand and fall on tables.
-                    && key != "climb")
+                if ((fixture.CollisionMask & (int)CollisionGroup.MidImpassable) == 0 || !fixture.Hard)
                     continue;
 
                 standingState.ChangedFixtures.Add(key);
-                if (fixture.Hard)
-                    _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask & ~StandingCollisionLayer, manager: fixtureComponent);
+                _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask & ~StandingCollisionLayer, manager: fixtureComponent);
             }
+
+            if (TryComp<ClimbingComponent>(uid, out var climbingComponent))
+                foreach (var climbFixture in climbingComponent.DisabledFixtureMasks)
+                    if (!standingState.ChangedFixtures.Contains(climbFixture.Key))
+                        standingState.ChangedFixtures.Add(climbFixture.Key);
         }
 
         // check if component was just added or streamed to client
@@ -184,25 +187,13 @@ public sealed class StandingStateSystem : EntitySystem
             {
                 if (fixtureComponent.Fixtures.TryGetValue(key, out var fixture))
                 {
-                    _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask | StandingCollisionLayer, fixtureComponent);
-                }
-
-
-            }
-        }
-        standingState.ChangedFixtures.Clear();
-        if (TryComp<ClimbingComponent>(uid, out var component))
-        {
-
-            foreach (var entity in _physics.GetEntitiesIntersectingBody(uid, StandingCollisionLayer, true))
-            {
-                if (TryComp<ClimbableComponent>(entity, out var climbable))
-                {
-                    _climbing.Climb(uid, uid, entity, false, component, animation: false);
+                    if (!TryComp<ClimbingComponent>(uid, out var climbing) || !climbing.DisabledFixtureMasks.ContainsKey(key))
+                        _physics.SetCollisionMask(uid, key, fixture, fixture.CollisionMask | StandingCollisionLayer, fixtureComponent);
                 }
             }
-        }
 
+            standingState.ChangedFixtures.Clear();
+        }
         return true;
     }
 }

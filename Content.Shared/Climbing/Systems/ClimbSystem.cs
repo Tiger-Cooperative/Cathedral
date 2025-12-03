@@ -62,7 +62,6 @@ public sealed partial class ClimbSystem : VirtualController
         SubscribeLocalEvent<ClimbingComponent, UpdateCanMoveEvent>(OnMoveAttempt);
         SubscribeLocalEvent<ClimbingComponent, EntParentChangedMessage>(OnParentChange);
         SubscribeLocalEvent<ClimbingComponent, ClimbDoAfterEvent>(OnDoAfter);
-        //SubscribeLocalEvent<ClimbableComponent, StartCollideEvent>(OnStartCollide);
         SubscribeLocalEvent<ClimbingComponent, EndCollideEvent>(OnClimbEndCollide);
         SubscribeLocalEvent<ClimbingComponent, BuckledEvent>(OnBuckled);
         SubscribeLocalEvent<ClimbingComponent, EntGotInsertedIntoContainerMessage>(OnStored);
@@ -223,7 +222,7 @@ public sealed partial class ClimbSystem : VirtualController
             return true;
 
         var ev = new AttemptClimbEvent(user, entityToMove, climbable);
-        RaiseLocalEvent(climbable, ref ev);
+        RaiseLocalEvent(user, ref ev);
         if (ev.Cancelled)
             return false;
 
@@ -438,8 +437,7 @@ public sealed partial class ClimbSystem : VirtualController
                 continue;
             }
 
-            // Used for making sure that people can't permanently phase through tables if they are lying down when they stop colliding.
-            var masks = (fixtureMask & (int)CollisionGroup.MidImpassable) == 0 ? fixtureMask | (int)CollisionGroup.MidImpassable : (fixtureMask);
+            var masks = (!TryComp<StandingStateComponent>(uid, out var standing) || !standing.Standing) ? fixtureMask & ~(int)CollisionGroup.MidImpassable : fixtureMask;
             _physics.SetCollisionMask(uid, name, fixture, fixture.CollisionMask | masks, fixtures);
         }
 
