@@ -27,8 +27,6 @@
 
   [bold]Manual activation triggers all unlocked nodes at once and consumes durability.[/bold]
 
-  <GuideReagentEmbed Reagent="ArtifactGlue"/>
-
   ## Triggers
   Examples include:
   - Examining the artifact
