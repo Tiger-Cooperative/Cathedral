@@ -1,6 +1,8 @@
 using Content.Shared.Alert;
 using Content.Shared.Buckle.Components;
 using Content.Shared.CCVar;
+using Content.Shared.Climbing.Components;
+using Content.Shared.Climbing.Events;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.Database;
@@ -52,6 +54,7 @@ public abstract partial class SharedStunSystem
         // Action blockers
         SubscribeLocalEvent<KnockedDownComponent, BuckleAttemptEvent>(OnBuckleAttempt);
         SubscribeLocalEvent<KnockedDownComponent, StandAttemptEvent>(OnStandAttempt);
+        SubscribeLocalEvent<KnockedDownComponent, AttemptClimbEvent>(OnClimbAttempt);
 
         // Updating movement a friction
         SubscribeLocalEvent<KnockedDownComponent, RefreshMovementSpeedModifiersEvent>(OnRefreshKnockedSpeed);
@@ -69,7 +72,6 @@ public abstract partial class SharedStunSystem
         SubscribeLocalEvent<GravityAffectedComponent, GetStandUpTimeEvent>(OnGetStandUpTime);
 
         // Handling Alternative Inputs
-        SubscribeAllEvent<ForceStandUpEvent>(OnForceStandup);
         SubscribeLocalEvent<KnockedDownComponent, KnockedDownAlertEvent>(OnKnockedDownAlert);
 
         CommandBinds.Builder
@@ -383,47 +385,13 @@ public abstract partial class SharedStunSystem
 
     }
 
-    private void OnForceStandup(ForceStandUpEvent msg, EntitySessionEventArgs args)
-    {
-        if (args.SenderSession.AttachedEntity is not {} user)
-            return;
-
-        ForceStandUp(user);
-    }
-
-    public void ForceStandUp(Entity<KnockedDownComponent?> entity)
-    {
-        if (!Resolve(entity, ref entity.Comp, false))
-            return;
-
-        // That way if we fail to stand, the game will try to stand for us when we are able to
-        SetAutoStand(entity, true);
-
-        if (StandingBlocked((entity, entity.Comp)))
-            return;
-
-        if (!_hands.TryGetEmptyHand(entity.Owner, out _))
-            return;
-
-        if (!TryForceStand(entity.Owner))
-            return;
-
-        // If we have a DoAfter, cancel it
-        CancelKnockdownDoAfter(entity);
-        // Remove Component
-        RemComp<KnockedDownComponent>(entity);
-
-        _adminLogger.Add(LogType.Stamina, LogImpact.Medium, $"{ToPrettyString(entity):user} has force stood up from knockdown.");
-    }
-
     private void OnKnockedDownAlert(Entity<KnockedDownComponent> entity, ref KnockedDownAlertEvent args)
     {
         if (args.Handled)
             return;
 
         // If we're already trying to stand, or we fail to stand try forcing it
-        if (!TryStanding(entity.Owner))
-            ForceStandUp((entity.Owner, entity.Comp));
+        TryStanding(entity.Owner);
 
         args.Handled = true;
     }
@@ -473,14 +441,15 @@ public abstract partial class SharedStunSystem
             if (!fixtureQuery.TryGetComponent(ent, out var fixtures))
                 continue;
 
-            if (!xformQuery.TryComp(ent, out var xformComp))
+            if (!xformQuery.TryComp(ent, out var xformComp) || HasComp<ClimbableComponent>(ent)
+                && TryComp<ClimbingComponent>(entity, out var climbing) && climbing.IsClimbing)
                 continue;
 
             var xform = new Transform(xformComp.LocalPosition, xformComp.LocalRotation);
 
             foreach (var fixture in fixtures.Fixtures.Values)
             {
-                if (!fixture.Hard || (fixture.CollisionMask & StandingStateSystem.StandingCollisionLayer) != StandingStateSystem.StandingCollisionLayer)
+                if (!fixture.Hard || (fixture.CollisionLayer & StandingStateSystem.StandingCollisionLayer) != StandingStateSystem.StandingCollisionLayer)
                     continue;
 
                 for (var i = 0; i < fixture.Shape.ChildCount; i++)
@@ -555,6 +524,15 @@ public abstract partial class SharedStunSystem
     {
         if (args.User == entity && entity.Comp.NextUpdate > GameTiming.CurTime)
             args.Cancelled = true;
+    }
+
+    private void OnClimbAttempt(Entity<KnockedDownComponent> entity, ref AttemptClimbEvent args)
+    {
+        if (args.User == entity.Owner)
+        {
+            args.Cancelled = true;
+            _popup.PopupClient(Loc.GetString("knockdown-component-climb-failure"), entity, entity);
+        }
     }
 
     #endregion
