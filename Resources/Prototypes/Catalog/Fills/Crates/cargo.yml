@@ -139,11 +139,9 @@
     - id: ClothingUniformJumpsuitFamilyGuy
       weight: 5
     - id: ClothingOuterHardsuitCBURN
-      prob: 0.1
-      orGroup: Clothes
+      weight: 0.1
     - id: ClothingOuterHardsuitBasic
-      prob: 0.1
-      orGroup: Clothes
+      weight: 0.1
     - id: ClothingBackpackERTClown
       weight: 0.1
     - id: ClothingNeckCloakAdmin
