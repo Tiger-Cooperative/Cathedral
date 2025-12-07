@@ -1332,7 +1332,7 @@
   abstract: true
   components:
   - type: CombatMode
-    canDisarm: true
+    canShove: true
   - type: Inventory
     templateId: monkey
     speciesId: monkey
