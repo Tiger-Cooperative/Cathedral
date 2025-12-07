@@ -630,11 +630,6 @@ CigaretteSpaceDrugs: CigaretteLipolicide
 CigaretteMilk: CigaretteHaloperidol
 CigaretteBread: CigaretteBbqSauce
 
-# 2025-05-09
-ClothingOuterHardsuitBasic: ClothingOuterHardsuitEVA
-ClothingHeadHelmetHardsuitBasic: null
-SuitStorageBasic: SuitStorageEVA
-
 # 2025-05-18
 ClothingNeckCloakMiner: null
 
@@ -713,6 +708,11 @@ PrefilledSyringe: Syringe
 # 2025-10-08
 ClothingBeltAssault: ClothingBeltMilitaryWebbing
 WarpPointBombing: null
+
+# 2025-10-13
+ToyGriffin: ToyFigurineGriffin
+ToyOwlman: ToyFigurineOwlman
+ToySkeleton: ToyFigurineSkeleton
 
 # 2025-10-28
 DrinkKiraSpecial: DrinkOrangeLimeSodaGlass
