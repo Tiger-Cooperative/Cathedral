@@ -53,7 +53,7 @@ public sealed class SolutionDumpingSystem : EntitySystem
     private void OnDrainableCanDragDropped(Entity<DrainableSolutionComponent> ent, ref CanDropDraggedEvent args)
     {
         // Easily drawn-from thing can be dragged onto easily refillable thing.
-        if (!_refillableQuery.HasComp(args.Target) && !_dumpQuery.HasComp(args.Target))
+        if (!_dumpQuery.HasComp(args.Target))
             return;
 
         args.CanDrop = true;
