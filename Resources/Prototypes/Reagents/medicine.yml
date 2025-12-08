@@ -1468,8 +1468,6 @@
   group: Medicine
   desc: reagent-desc-warfarin
   physicalDesc: reagent-physical-desc-thin
-  allowedDepartments:
-  - Medical
   flavor: medicine
   color: "#d0e21b"
   metabolisms:
