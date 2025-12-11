@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Content.Server.Chat.Systems;
 using Content.Server.Popups;
 using Content.Server.Power.EntitySystems;
@@ -40,6 +41,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
     [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly PvsOverrideSystem _pvs = default!;
+    [Dependency] private readonly EyeSystem _eye = default!;
 
     private float _updateTimer = 1.0f;
     private const float UpdateTime = 1.0f;
@@ -265,11 +267,15 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
     private void OnHoloCallCommenced(Entity<HolopadComponent> source, ref TelephoneCallCommencedEvent args)
     {
-        if (source.Comp.Hologram == null)
-            GenerateHologram(source);
+        // There's gotta be a better way to do this. I plan to turn it into a datafield of HolopadComponent, but the check itself should be neater.
+        if (!HasComp<StationAiHolderComponent>(source) && !HasComp<StationAiHolderComponent>(args.Receiver))
+        {
+            if (source.Comp.Hologram == null && !HasComp<StationAiHolderComponent>(source.Owner))
+                GenerateHologram(source);
 
-        if (TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad) && receivingHolopad.Hologram == null)
-            GenerateHologram((args.Receiver, receivingHolopad));
+            if (TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad) && receivingHolopad.Hologram == null)
+                GenerateHologram((args.Receiver, receivingHolopad));
+        }
 
         // Re-link the user to refresh the sprite data
         LinkHolopadToUser(source, source.Comp.User);
@@ -693,6 +699,10 @@ public sealed class HolopadSystem : SharedHolopadSystem
         // Switch the AI's perspective from free roaming to the target holopad
         _xformSystem.SetCoordinates(stationAiCore.Comp.RemoteEntity.Value, Transform(entity).Coordinates);
         _stationAiSystem.SwitchRemoteEntityMode(stationAiCore, false);
+        if (TryComp<EyeComponent>(user, out var eye))
+            _eye.SetTarget(user, entity, eye);
+
+
 
         // Open the holopad UI if it hasn't been opened yet
         if (TryComp<UserInterfaceComponent>(entity, out var entityUserInterfaceComponent))

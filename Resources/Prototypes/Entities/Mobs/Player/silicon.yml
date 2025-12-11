@@ -490,8 +490,6 @@
   description: A holographic representation of an AI.
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
-  - type: Transform
-    anchored: true
   - type: Tag
     tags:
     - GhostOnlyWarp
@@ -500,8 +498,23 @@
     blacklist:
       tags:
       - GhostOnlyWarp
-  - type: Eye
-  - type: ContentEye
+  - type: Physics
+    bodyType: KinematicController
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.35
+        density: 50
+        mask:
+        - MobMask
+        layer:
+        - MobLayer
+  - type: InputMover
+  - type: MovementSpeedModifier
+  - type: MobMover
+  - type: Clickable
   - type: Examiner
   - type: Actions
   - type: Alerts
@@ -509,6 +522,11 @@
   - type: CargoSellBlacklist
   - type: StationAiVision
     range: 20
+  - type: Sprite
+    sprite: Mobs/Aliens/Carps/holo.rsi
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: alive
 
 # Borgs
 - type: entity
