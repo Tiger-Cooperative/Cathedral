@@ -9,6 +9,7 @@ using Content.Shared.Destructible;
 using Content.Shared.Doors.Systems;
 using Content.Shared.DoAfter;
 using Content.Shared.Electrocution;
+using Content.Shared.Holopad;
 using Content.Shared.Intellicard;
 using Content.Shared.Interaction;
 using Content.Shared.Item.ItemToggle;
@@ -22,6 +23,7 @@ using Content.Shared.Power;
 using Content.Shared.Power.EntitySystems;
 using Content.Shared.Repairable;
 using Content.Shared.StationAi;
+using Content.Shared.Telephone;
 using Content.Shared.Verbs;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
@@ -109,6 +111,7 @@ public abstract partial class SharedStationAiSystem : EntitySystem
         SubscribeLocalEvent<StationAiCoreComponent, ComponentShutdown>(OnAiShutdown);
         SubscribeLocalEvent<StationAiCoreComponent, PowerChangedEvent>(OnCorePower);
         SubscribeLocalEvent<StationAiCoreComponent, GetVerbsEvent<Verb>>(OnCoreVerbs);
+        SubscribeLocalEvent<StationAiCoreComponent, TelephoneCallCommencedEvent>(OnTelephoneCall);
 
         SubscribeLocalEvent<StationAiCoreComponent, BreakageEventArgs>(OnBroken);
         SubscribeLocalEvent<StationAiCoreComponent, RepairedEvent>(OnRepaired);
@@ -146,6 +149,16 @@ public abstract partial class SharedStationAiSystem : EntitySystem
                 Act = () => _uiSystem.TryOpenUi(ent.Owner, StationAiCustomizationUiKey.Key, insertedAi.Value),
                 Icon = new SpriteSpecifier.Texture(new("/Textures/Interface/emotes.svg.192dpi.png")),
             });
+        }
+    }
+
+    private void OnTelephoneCall(Entity<StationAiCoreComponent> ent, ref TelephoneCallCommencedEvent args)
+    {
+        if (TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad) && ent.Comp.RemoteEntity != null && receivingHolopad.Hologram != null)
+        {
+            var inserted = GetInsertedAI(ent);
+            if (inserted != null)
+                _mover.SetRelay(inserted.Value, receivingHolopad.Hologram.Value);
         }
     }
 
@@ -475,28 +488,26 @@ public abstract partial class SharedStationAiSystem : EntitySystem
         if (ent.Comp.RemoteEntity == null)
             return;
 
-        if (!_containers.TryGetContainer(ent.Owner, StationAiHolderComponent.Container, out var container) ||
-            container.ContainedEntities.Count != 1)
-        {
-            return;
-        }
-
         // Attach them to the portable eye that can move around.
-        var user = container.ContainedEntities[0];
+        var user = GetInsertedAI(ent);
+        if (user == null)
+            return;
 
         if (TryComp(user, out EyeComponent? eyeComp))
         {
-            _eye.SetDrawFov(user, false, eyeComp);
-            _eye.SetTarget(user, ent.Comp.RemoteEntity.Value, eyeComp);
+            _eye.SetDrawFov(user.Value, false, eyeComp);
+            _eye.SetTarget(user.Value, ent.Comp.RemoteEntity.Value, eyeComp);
         }
 
-        _mover.SetRelay(user, ent.Comp.RemoteEntity.Value);
+        // As it stands right now, any 'projections' don't actually have cameras. A hologram can't see.
+        if (ent.Comp.Remote)
+            _mover.SetRelay(user.Value, ent.Comp.RemoteEntity.Value);
 
-        var eyeName = Loc.GetString("station-ai-eye-name", ("name", Name(user)));
+        var eyeName = Loc.GetString("station-ai-eye-name", ("name", Name(user.Value)));
         _metadata.SetEntityName(ent.Comp.RemoteEntity.Value, eyeName);
     }
 
-    private EntityUid? GetInsertedAI(Entity<StationAiCoreComponent> ent)
+    public EntityUid? GetInsertedAI(Entity<StationAiCoreComponent> ent)
     {
         if (!_containers.TryGetContainer(ent.Owner, StationAiHolderComponent.Container, out var container) ||
             container.ContainedEntities.Count != 1)

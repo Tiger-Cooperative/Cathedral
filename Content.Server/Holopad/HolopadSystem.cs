@@ -24,6 +24,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using System.Linq;
+using Content.Shared.Movement.Systems;
 
 namespace Content.Server.Holopad;
 
@@ -41,7 +42,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
     [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly PvsOverrideSystem _pvs = default!;
-    [Dependency] private readonly EyeSystem _eye = default!;
+    [Dependency] private readonly SharedMoverController _mover = default!;
 
     private float _updateTimer = 1.0f;
     private const float UpdateTime = 1.0f;
@@ -267,15 +268,13 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
     private void OnHoloCallCommenced(Entity<HolopadComponent> source, ref TelephoneCallCommencedEvent args)
     {
-        // There's gotta be a better way to do this. I plan to turn it into a datafield of HolopadComponent, but the check itself should be neater.
-        if (!HasComp<StationAiHolderComponent>(source) && !HasComp<StationAiHolderComponent>(args.Receiver))
-        {
-            if (source.Comp.Hologram == null && !HasComp<StationAiHolderComponent>(source.Owner))
-                GenerateHologram(source);
+        // if (source.Comp.Hologram == null)
+        //     GenerateHologram(source);
 
-            if (TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad) && receivingHolopad.Hologram == null)
-                GenerateHologram((args.Receiver, receivingHolopad));
-        }
+        // A little weird to send the info to the other one first, but the holograms don't display the person if you use source.
+        // I can only assume it's something to do with the order of linking and generating the hologram.
+        if (TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad) && receivingHolopad.Hologram == null)
+            GenerateHologram((args.Receiver, receivingHolopad));
 
         // Re-link the user to refresh the sprite data
         LinkHolopadToUser(source, source.Comp.User);
@@ -547,13 +546,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
         }
 
         entity.Comp.Hologram = new Entity<HolopadHologramComponent>(hologramUid, holopadHologram);
-
-        // Relay speech preferentially through the hologram
-        if (TryComp<SpeechComponent>(hologramUid, out var hologramSpeech) &&
-            TryComp<TelephoneComponent>(entity, out var entityTelephone))
-        {
-            _telephoneSystem.SetSpeakerForTelephone((entity, entityTelephone), (hologramUid, hologramSpeech));
-        }
     }
 
     private void DeleteHologram(Entity<HolopadHologramComponent> hologram, Entity<HolopadComponent> attachedHolopad)
@@ -699,10 +691,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
         // Switch the AI's perspective from free roaming to the target holopad
         _xformSystem.SetCoordinates(stationAiCore.Comp.RemoteEntity.Value, Transform(entity).Coordinates);
         _stationAiSystem.SwitchRemoteEntityMode(stationAiCore, false);
-        if (TryComp<EyeComponent>(user, out var eye))
-            _eye.SetTarget(user, entity, eye);
-
-
 
         // Open the holopad UI if it hasn't been opened yet
         if (TryComp<UserInterfaceComponent>(entity, out var entityUserInterfaceComponent))
