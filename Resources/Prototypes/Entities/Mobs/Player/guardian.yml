@@ -141,9 +141,9 @@
           map: [ "enum.DamageStateVisualLayers.BaseUnshaded" ]
           color: "#40a7d7"
           shader: unshaded
-    - type: HTN
-      rootTask:
-        task: SimpleHumanoidHostileCompound
+#    - type: HTN
+#      rootTask:
+#        task: SimpleHumanoidHostileCompound
 
 # From Wizard deck of cards
 - type: entity
@@ -258,9 +258,9 @@
     - type: NpcFactionMember
       factions:
         - Syndicate
-    - type: HTN
-      rootTask:
-        task: SimpleHumanoidHostileCompound
+#    - type: HTN
+#      rootTask:
+#        task: SimpleHumanoidHostileCompound
 
 - type: entity
   parent: BaseMentalAction

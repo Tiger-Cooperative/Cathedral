@@ -1,0 +1,20 @@
+- type: entity
+  id: BoundAnchorEntity
+#  categories: [ HideSpawnMenu ]
+  components:
+  - type: Transform
+  - type: Sprite # Sprite data is dynamically set in Client.HolopadSystem
+    sprite: Mobs/Aliens/Carps/holo.rsi
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: alive
+  - type: Appearance
+  - type: Physics
+    bodyType: Kinematic
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.35
+        density: 25
