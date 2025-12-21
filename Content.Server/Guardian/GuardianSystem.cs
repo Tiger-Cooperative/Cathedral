@@ -1,4 +1,3 @@
-using Content.Server._Cathedral.EntityBound;
 using Content.Server.Body.Systems;
 using Content.Server.Popups;
 using Content.Shared._Cathedral.EntityBound;

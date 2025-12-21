@@ -9,12 +9,12 @@ namespace Content.Shared._Cathedral.EntityBound;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class EntityAnchorComponent : Component
 {
-    [AutoNetworkedField]
+    [AutoNetworkedField, DataField]
     public EntityUid? BoundEntity;
 
     /// <summary>
     /// Refers to the invisible entity that holds the joint down.
     /// </summary>
-    [AutoNetworkedField]
+    [AutoNetworkedField, DataField]
     public EntityUid? FollowingEnt;
 }
