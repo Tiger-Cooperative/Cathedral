@@ -1,8 +1,4 @@
 using Robust.Shared.GameStates;
-using Robust.Shared.Serialization;
-using System.Numerics;
-using Robust.Shared.Map;
-using Robust.Shared.Physics.Dynamics.Joints;
 
 namespace Content.Shared._Cathedral.EntityBound;
 
