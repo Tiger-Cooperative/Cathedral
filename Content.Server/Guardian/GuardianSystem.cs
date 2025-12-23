@@ -1,5 +1,6 @@
 using Content.Server.Body.Systems;
 using Content.Server.Popups;
+using Content.Shared._Cathedral.EntityBound;
 using Content.Shared.Actions;
 using Content.Shared.Damage.Systems;
 using Content.Shared.DoAfter;
@@ -12,6 +13,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Mech.EntitySystems;
 using Content.Shared.Mobs;
+using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
@@ -34,6 +36,8 @@ namespace Content.Server.Guardian
         [Dependency] private readonly BodySystem _bodySystem = default!;
         [Dependency] private readonly SharedContainerSystem _container = default!;
         [Dependency] private readonly SharedTransformSystem _transform = default!;
+        [Dependency] private readonly EntityBoundSystem _bound = default!;
+        [Dependency] private readonly PullingSystem _pull = default!;
 
         public override void Initialize()
         {
@@ -44,13 +48,11 @@ namespace Content.Server.Guardian
             SubscribeLocalEvent<GuardianCreatorComponent, GuardianCreatorDoAfterEvent>(OnDoAfter);
 
             SubscribeLocalEvent<GuardianComponent, ComponentShutdown>(OnGuardianShutdown);
-            SubscribeLocalEvent<GuardianComponent, MoveEvent>(OnGuardianMove);
             SubscribeLocalEvent<GuardianComponent, DamageChangedEvent>(OnGuardianDamaged);
             SubscribeLocalEvent<GuardianComponent, PlayerAttachedEvent>(OnGuardianPlayerAttached);
             SubscribeLocalEvent<GuardianComponent, PlayerDetachedEvent>(OnGuardianPlayerDetached);
 
             SubscribeLocalEvent<GuardianHostComponent, ComponentInit>(OnHostInit);
-            SubscribeLocalEvent<GuardianHostComponent, MoveEvent>(OnHostMove);
             SubscribeLocalEvent<GuardianHostComponent, MobStateChangedEvent>(OnHostStateChange);
             SubscribeLocalEvent<GuardianHostComponent, ComponentShutdown>(OnHostShutdown);
 
@@ -165,7 +167,13 @@ namespace Content.Server.Guardian
             if (guardianComponent.GuardianLoose)
                 RetractGuardian(user, hostComponent, hostComponent.HostedGuardian.Value, guardianComponent);
             else
+            {
                 ReleaseGuardian(user, hostComponent, hostComponent.HostedGuardian.Value, guardianComponent);
+                // I'll re-do this part eventually. I just need it to not crash the client when you start the bind.
+                if (!HasComp<EntityBoundComponent>(hostComponent.HostedGuardian))
+                    _bound.BindToEntity(hostComponent.HostedGuardian.Value, user, guardianComponent.DistanceAllowed);
+            }
+            _bound.SetJointStatus(hostComponent.HostedGuardian.Value, guardianComponent.GuardianLoose);
         }
 
         /// <summary>
@@ -302,58 +310,6 @@ namespace Content.Server.Guardian
         {
            if (component.Used)
                args.PushMarkup(Loc.GetString("guardian-activator-empty-examine"));
-        }
-
-        /// <summary>
-        /// Called every time the host moves, to make sure the distance between the host and the guardian isn't too far
-        /// </summary>
-        private void OnHostMove(EntityUid uid, GuardianHostComponent component, ref MoveEvent args)
-        {
-            if (!TryComp(component.HostedGuardian, out GuardianComponent? guardianComponent) ||
-                !guardianComponent.GuardianLoose)
-            {
-                return;
-            }
-
-            CheckGuardianMove(uid, component.HostedGuardian.Value, component);
-        }
-
-        /// <summary>
-        /// Called every time the guardian moves: makes sure it's not out of it's allowed distance
-        /// </summary>
-        private void OnGuardianMove(EntityUid uid, GuardianComponent component, ref MoveEvent args)
-        {
-            if (!component.GuardianLoose || component.Host == null)
-                return;
-
-            CheckGuardianMove(component.Host.Value, uid, guardianComponent: component);
-        }
-
-        /// <summary>
-        /// Retract the guardian if either the host or the guardian move away from each other.
-        /// </summary>
-        private void CheckGuardianMove(
-            EntityUid hostUid,
-            EntityUid guardianUid,
-            GuardianHostComponent? hostComponent = null,
-            GuardianComponent? guardianComponent = null,
-            TransformComponent? hostXform = null,
-            TransformComponent? guardianXform = null)
-        {
-            if (TerminatingOrDeleted(guardianUid) || TerminatingOrDeleted(hostUid))
-                return;
-
-            if (!Resolve(hostUid, ref hostComponent, ref hostXform) ||
-                !Resolve(guardianUid, ref guardianComponent, ref guardianXform))
-            {
-                return;
-            }
-
-            if (!guardianComponent.GuardianLoose)
-                return;
-
-            if (!_transform.InRange(guardianXform.Coordinates, hostXform.Coordinates, guardianComponent.DistanceAllowed))
-                RetractGuardian(hostUid, hostComponent, guardianUid, guardianComponent);
         }
 
         private void ReleaseGuardian(EntityUid host, GuardianHostComponent hostComponent, EntityUid guardian, GuardianComponent guardianComponent)
