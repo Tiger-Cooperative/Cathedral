@@ -10,7 +10,7 @@ namespace Content.Shared._Cathedral.EntityBound;
 public sealed partial class EntityAnchorComponent : Component
 {
     [AutoNetworkedField, DataField]
-    public EntityUid? BoundEntity;
+    public List<EntityUid> BoundEntities = new List<EntityUid>();
 
     /// <summary>
     /// Refers to the invisible entity that holds the joint down.

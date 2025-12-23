@@ -1,14 +1,8 @@
 - type: entity
   id: BoundAnchorEntity
-#  categories: [ HideSpawnMenu ]
+  categories: [ HideSpawnMenu ]
   components:
   - type: Transform
-  - type: Sprite # Sprite data is dynamically set in Client.HolopadSystem
-    sprite: Mobs/Aliens/Carps/holo.rsi
-    layers:
-    - map: [ "enum.DamageStateVisualLayers.Base" ]
-      state: alive
-  - type: Appearance
   - type: Physics
     bodyType: Kinematic
   - type: Fixtures
