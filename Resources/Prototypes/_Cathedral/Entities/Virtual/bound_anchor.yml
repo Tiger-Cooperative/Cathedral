@@ -12,3 +12,9 @@
           !type:PhysShapeCircle
           radius: 0.35
         density: 25
+  - type: Sprite
+    drawdepth: Mobs
+    sprite: Mobs/Aliens/Carps/holo.rsi
+    layers:
+    - map: [ "enum.DamageStateVisualLayers.Base" ]
+      state: alive

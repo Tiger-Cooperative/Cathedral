@@ -1,5 +1,3 @@
-using Content.Shared.Movement.Pulling.Systems;
-using Robust.Shared.Audio.Systems;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Systems;
@@ -17,8 +15,6 @@ public sealed class EntityBoundSystem : EntitySystem
     [Dependency] private readonly SharedJointSystem _joints = default!;
     [Dependency] private readonly SharedPhysicsSystem _physics = default!;
     [Dependency] private readonly IGameTiming _timer = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly PullingSystem _pull = default!;
 
     public override void Initialize()
     {
@@ -47,7 +43,7 @@ public sealed class EntityBoundSystem : EntitySystem
             if (!TryComp<PhysicsComponent>(uid, out var physics) || !HasComp<PhysicsComponent>(comp.FollowingEnt))
                 return;
             _physics.SetLinearVelocity(comp.FollowingEnt.Value, physics.LinearVelocity);
-            // SetCoordinates makes sure that it also teleports with the user and helps thwart overzealous prediction.
+            // SetCoordinates makes sure that it also teleports with the user and helps thwart overzealous prediction (though I'd like to find another solution to that).
             // Uses a range query to not lag out the client constantly.
             if (!_xForm.InRange(comp.FollowingEnt.Value, uid, 1f))
                 _xForm.SetCoordinates(comp.FollowingEnt.Value, Transform(uid).Coordinates);
