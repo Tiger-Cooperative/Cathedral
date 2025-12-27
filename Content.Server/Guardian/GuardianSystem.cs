@@ -13,7 +13,6 @@ using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Mech.EntitySystems;
 using Content.Shared.Mobs;
-using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
@@ -37,7 +36,6 @@ namespace Content.Server.Guardian
         [Dependency] private readonly SharedContainerSystem _container = default!;
         [Dependency] private readonly SharedTransformSystem _transform = default!;
         [Dependency] private readonly EntityBoundSystem _bound = default!;
-        [Dependency] private readonly PullingSystem _pull = default!;
 
         public override void Initialize()
         {
