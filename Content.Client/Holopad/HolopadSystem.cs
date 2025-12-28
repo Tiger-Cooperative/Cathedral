@@ -6,6 +6,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using System.Linq;
 using System.Numerics;
+using Content.Client._Cathedral.Holopad;
 using DrawDepth = Content.Shared.DrawDepth.DrawDepth;
 
 namespace Content.Client.Holopad;
@@ -15,6 +16,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IOverlayManager _overlay = default!;
 
     public override void Initialize()
     {
@@ -23,6 +25,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
         SubscribeLocalEvent<HolopadHologramComponent, ComponentStartup>(OnComponentStartup);
         SubscribeLocalEvent<HolopadHologramComponent, BeforePostShaderRenderEvent>(OnShaderRender);
         SubscribeAllEvent<TypingChangedEvent>(OnTypingChanged);
+        _overlay.AddOverlay(new HolopadOverlay(EntityManager));
     }
 
     private void OnComponentStartup(Entity<HolopadHologramComponent> entity, ref ComponentStartup ev)

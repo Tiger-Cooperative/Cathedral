@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Content.Server.Chat.Systems;
 using Content.Server.Popups;
 using Content.Server.Power.EntitySystems;
@@ -13,7 +12,6 @@ using Content.Shared.Labels.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Power;
 using Content.Shared.Silicons.StationAi;
-using Content.Shared.Speech;
 using Content.Shared.Speech.Components;
 using Content.Shared.Telephone;
 using Content.Shared.UserInterface;
@@ -42,7 +40,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
     [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly PvsOverrideSystem _pvs = default!;
-    [Dependency] private readonly SharedMoverController _mover = default!;
 
     private float _updateTimer = 1.0f;
     private const float UpdateTime = 1.0f;
@@ -268,9 +265,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
     private void OnHoloCallCommenced(Entity<HolopadComponent> source, ref TelephoneCallCommencedEvent args)
     {
-        // if (source.Comp.Hologram == null)
-        //     GenerateHologram(source);
-
         // A little weird to send the info to the other one first, but the holograms don't display the person if you use source.
         // I can only assume it's something to do with the order of linking and generating the hologram.
         if (TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad) && receivingHolopad.Hologram == null)
@@ -545,6 +539,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
             return;
         }
 
+        holopadHologram.LinkedSource = entity.Owner;
         entity.Comp.Hologram = new Entity<HolopadHologramComponent>(hologramUid, holopadHologram);
     }
 
