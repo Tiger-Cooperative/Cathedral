@@ -188,10 +188,10 @@
     alpha: 0.9
     intensity: 2
     scrollRate: 0.125
-    offset: -0.02, 0.45
-#  - type: Tag
-#    tags:
-#    - HideContextMenu
+#    offset: -0.02, 0.45
+  - type: Tag
+    tags:
+    - HideContextMenu
 
 ## Mapping prototypes
 # General

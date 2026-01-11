@@ -7,6 +7,7 @@ using Robust.Shared.Timing;
 using System.Linq;
 using System.Numerics;
 using Content.Client._Cathedral.Holopad;
+using Robust.Client.Player;
 using DrawDepth = Content.Shared.DrawDepth.DrawDepth;
 
 namespace Content.Client.Holopad;
@@ -17,12 +18,14 @@ public sealed class HolopadSystem : SharedHolopadSystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
     [Dependency] private readonly IOverlayManager _overlay = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<HolopadHologramComponent, ComponentStartup>(OnComponentStartup);
+        SubscribeLocalEvent<HolopadHologramComponent, ComponentShutdown>(OnComponentShutdown);
         SubscribeLocalEvent<HolopadHologramComponent, BeforePostShaderRenderEvent>(OnShaderRender);
         SubscribeAllEvent<TypingChangedEvent>(OnTypingChanged);
         _overlay.AddOverlay(new HolopadOverlay(EntityManager));
@@ -31,6 +34,12 @@ public sealed class HolopadSystem : SharedHolopadSystem
     private void OnComponentStartup(Entity<HolopadHologramComponent> entity, ref ComponentStartup ev)
     {
         UpdateHologramSprite(entity, entity.Comp.LinkedEntity);
+        _overlay.AddOverlay(new HologramViewerOverlay(EntityManager, _playerManager));
+    }
+
+    private void OnComponentShutdown(Entity<HolopadHologramComponent> ent, ref ComponentShutdown ev)
+    {
+        _overlay.RemoveOverlay<HologramViewerOverlay>();
     }
 
     private void OnShaderRender(Entity<HolopadHologramComponent> entity, ref BeforePostShaderRenderEvent ev)

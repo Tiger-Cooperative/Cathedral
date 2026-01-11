@@ -22,7 +22,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using System.Linq;
-using Content.Shared.Movement.Systems;
+using Content.Shared._Cathedral.EntityBound;
 
 namespace Content.Server.Holopad;
 
@@ -40,9 +40,11 @@ public sealed class HolopadSystem : SharedHolopadSystem
     [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly PvsOverrideSystem _pvs = default!;
+    [Dependency] private readonly EntityBoundSystem _bound = default!;
 
     private float _updateTimer = 1.0f;
     private const float UpdateTime = 1.0f;
+    private const float HoloRange = 3.5f;
 
     public override void Initialize()
     {
@@ -682,6 +684,10 @@ public sealed class HolopadSystem : SharedHolopadSystem
             return;
 
         LinkHolopadToUser((stationAiCore, stationAiHolopad), user);
+
+        if (entity.Comp.Hologram != null)
+            // magic number in range is a placeholder for now, just picked based on what 'feels ok.'
+            _bound.BindToEntity(entity.Comp.Hologram.Value, entity.Owner, HoloRange);
 
         // Switch the AI's perspective from free roaming to the target holopad
         _xformSystem.SetCoordinates(stationAiCore.Comp.RemoteEntity.Value, Transform(entity).Coordinates);
