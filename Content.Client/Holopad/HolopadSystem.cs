@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Content.Shared.Chat.TypingIndicator;
 using Content.Shared.Holopad;
 using Robust.Client.GameObjects;
@@ -47,7 +48,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
         if (ev.Sprite.PostShader == null)
             return;
 
-        UpdateHologramSprite(entity, entity.Comp.LinkedEntity);
+        UpdateHologramShader(entity.Owner, ev.Sprite, entity.Comp);
     }
 
     private void OnTypingChanged(TypingChangedEvent ev, EntitySessionEventArgs args)
