@@ -488,10 +488,10 @@
   id: StationAiHoloLocal
   name: AI hologram
   description: A holographic representation of an AI.
-  # categories: [ HideSpawnMenu, DoNotMap ]
+  categories: [ HideSpawnMenu, DoNotMap ]
   components:
-  # - type: Transform
-  #   anchored: true
+  - type: Transform
+    anchored: true
   - type: Tag
     tags:
     - GhostOnlyWarp
@@ -500,14 +500,8 @@
     blacklist:
       tags:
       - GhostOnlyWarp
-  - type: Physics
-    bodyType: KinematicController
   - type: Eye
   - type: ContentEye
-  - type: InputMover
-  - type: MobMover
-  - type: MovementSpeedModifier
-  - type: LagCompensation
   - type: Examiner
   - type: Actions
   - type: Alerts
@@ -515,23 +509,6 @@
   - type: CargoSellBlacklist
   - type: StationAiVision
     range: 20
-  - type: Sprite
-    sprite: Mobs/Silicon/station_ai.rsi
-    layers:
-    - state: ai_camera
-      shader: unshaded
-      map: ["base"]
-  - type: Fixtures
-    fixtures:
-      fix1:
-        shape:
-          !type:PhysShapeCircle
-          radius: 0.35
-        density: 50
-        mask:
-        - Opaque
-        layer:
-        - Opaque
 
 # Borgs
 - type: entity

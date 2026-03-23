@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Content.Shared.Chat.TypingIndicator;
 using Content.Shared.Holopad;
 using Robust.Client.GameObjects;

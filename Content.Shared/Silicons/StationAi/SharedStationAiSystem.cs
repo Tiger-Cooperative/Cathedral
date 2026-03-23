@@ -25,7 +25,6 @@ using Content.Shared.Repairable;
 using Content.Shared.StationAi;
 using Content.Shared.Telephone;
 using Content.Shared.Verbs;
-using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
@@ -486,14 +485,13 @@ public abstract partial class SharedStationAiSystem : EntitySystem
             _eye.SetTarget(user.Value, ent.Comp.RemoteEntity.Value, eyeComp);
         }
 
-        if (ent.Comp.Remote)
-            _mover.SetRelay(user.Value, ent.Comp.RemoteEntity.Value);
+        _mover.SetRelay(user.Value, ent.Comp.RemoteEntity.Value);
 
         var eyeName = Loc.GetString("station-ai-eye-name", ("name", Name(user.Value)));
         _metadata.SetEntityName(ent.Comp.RemoteEntity.Value, eyeName);
     }
 
-    public EntityUid? GetInsertedAI(Entity<StationAiCoreComponent> ent)
+    private EntityUid? GetInsertedAI(Entity<StationAiCoreComponent> ent)
     {
         if (!_containers.TryGetContainer(ent.Owner, StationAiHolderComponent.Container, out var container) ||
             container.ContainedEntities.Count != 1)

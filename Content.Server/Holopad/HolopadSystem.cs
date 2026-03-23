@@ -195,7 +195,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
             // Switch the AI's perspective from free roaming to the target holopad
             _xformSystem.SetCoordinates(stationAiCore.Comp.RemoteEntity.Value, Transform(source).Coordinates);
-            // _stationAiSystem.SwitchRemoteEntityMode(stationAiCore, false);
 
             return;
         }
@@ -622,9 +621,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
         if (HasComp<StationAiHeldComponent>(entity.Comp.User) &&
             _stationAiSystem.TryGetCore(entity.Comp.User.Value, out var stationAiCore))
         {
-            // Return the AI eye to free roaming
-            // _stationAiSystem.SwitchRemoteEntityMode(stationAiCore, true);
-
             // If the AI core is still broadcasting, end its calls
             if (TryComp<TelephoneComponent>(stationAiCore, out var stationAiCoreTelephone) &&
                 _telephoneSystem.IsTelephoneEngaged((stationAiCore.Owner, stationAiCoreTelephone)))
@@ -691,7 +687,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
         // Switch the AI's perspective from free roaming to the target holopad
         _xformSystem.SetCoordinates(stationAiCore.Comp.RemoteEntity.Value, Transform(entity).Coordinates);
-        // _stationAiSystem.SwitchRemoteEntityMode(stationAiCore, false);
 
         // Open the holopad UI if it hasn't been opened yet
         if (TryComp<UserInterfaceComponent>(entity, out var entityUserInterfaceComponent))
