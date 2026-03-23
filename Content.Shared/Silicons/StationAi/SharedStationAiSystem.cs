@@ -25,6 +25,7 @@ using Content.Shared.Repairable;
 using Content.Shared.StationAi;
 using Content.Shared.Telephone;
 using Content.Shared.Verbs;
+using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
@@ -112,6 +113,7 @@ public abstract partial class SharedStationAiSystem : EntitySystem
         SubscribeLocalEvent<StationAiCoreComponent, PowerChangedEvent>(OnCorePower);
         SubscribeLocalEvent<StationAiCoreComponent, GetVerbsEvent<Verb>>(OnCoreVerbs);
         SubscribeLocalEvent<StationAiCoreComponent, TelephoneCallCommencedEvent>(OnTelephoneCall);
+        SubscribeLocalEvent<StationAiCoreComponent, TelephoneCallEndedEvent>(OnTelephoneEnd);
 
         SubscribeLocalEvent<StationAiCoreComponent, BreakageEventArgs>(OnBroken);
         SubscribeLocalEvent<StationAiCoreComponent, RepairedEvent>(OnRepaired);
@@ -154,12 +156,31 @@ public abstract partial class SharedStationAiSystem : EntitySystem
 
     private void OnTelephoneCall(Entity<StationAiCoreComponent> ent, ref TelephoneCallCommencedEvent args)
     {
-        if (TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad) && ent.Comp.RemoteEntity != null && receivingHolopad.Hologram != null)
+        // The main issue here is that everything gets done BEFORE the other eye is created.
+            if (!TryGetHeld((ent, ent.Comp), out var held) || ent.Comp.RemoteEntity == null ||
+                !TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad)  || receivingHolopad.Hologram == null
+                || _timing.ApplyingState)
+                return;
+            if (TryComp<EyeComponent>(held.Value, out var eyeComp))
+            {
+                _audio.PlayPvs(new SoundPathSpecifier("/Audio/Items/bikehorn.ogg"), args.Receiver);
+                _eye.SetDrawFov(held.Value, false, eyeComp);
+                _eye.SetTarget(held.Value, receivingHolopad.Hologram.Value, eyeComp);
+            }
+            _mover.SetRelay(held.Value, receivingHolopad.Hologram.Value);
+    }
+
+    private void OnTelephoneEnd(Entity<StationAiCoreComponent> ent, ref TelephoneCallEndedEvent args)
+    {
+        // I feel like fringe errors will pop up as people use this.
+        if (!TryGetHeld((ent, ent.Comp), out var held) || ent.Comp.RemoteEntity == null || _timing.ApplyingState)
+            return;
+        if (TryComp<EyeComponent>(held.Value, out var eyeComp))
         {
-            var inserted = GetInsertedAI(ent);
-            if (inserted != null)
-                _mover.SetRelay(inserted.Value, receivingHolopad.Hologram.Value);
+            _eye.SetDrawFov(held.Value, false, eyeComp);
+            _eye.SetTarget(held.Value, ent.Comp.RemoteEntity, eyeComp);
         }
+        _mover.SetRelay(held.Value, ent.Comp.RemoteEntity.Value);
     }
 
     private void OnAiAccessible(Entity<StationAiOverlayComponent> ent, ref AccessibleOverrideEvent args)
@@ -499,7 +520,6 @@ public abstract partial class SharedStationAiSystem : EntitySystem
             _eye.SetTarget(user.Value, ent.Comp.RemoteEntity.Value, eyeComp);
         }
 
-        // As it stands right now, any 'projections' don't actually have cameras. A hologram can't see.
         if (ent.Comp.Remote)
             _mover.SetRelay(user.Value, ent.Comp.RemoteEntity.Value);
 

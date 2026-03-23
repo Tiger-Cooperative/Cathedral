@@ -72,6 +72,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
             !TryComp<HolopadHologramComponent>(hologram, out var holopadhologram))
             return;
 
+        //TODO make this work for multi-layered sprites.
         var replace = true;
 
         // Remove all sprite layers only if it needs to change (right now just for holograms changing).
@@ -80,30 +81,25 @@ public sealed class HolopadSystem : SharedHolopadSystem
         {
             var spriteRSI = _sprite.LayerGetEffectiveRsi((hologram, hologramSprite), i);
             var spriteState = _sprite.LayerGetRsiState((hologram, hologramSprite), i);
-            if (holoAvatar is { LayerData: not null }
-                    // Adding the literal is a bandaid. I'll have to figure out how to fix it eventually.
-                    && spriteRSI != null && spriteRSI.Path.ToString() == "/Textures/" + holoAvatar.LayerData.First().RsiPath
-                    && spriteState == holoAvatar.LayerData.First().State)
-            {
-                replace = false;
-                continue;
-            }
-            _sprite.RemoveLayer((hologram, hologramSprite), i);
+            replace = holoAvatar?.LayerData == null || spriteRSI == null
+                    || spriteRSI.Path.ToString() != "/Textures/" + holoAvatar.LayerData.First().RsiPath ||
+                    spriteState != holoAvatar.LayerData.First().State;
+
+            if (replace)
+                _sprite.RemoveLayer((hologram, hologramSprite), i);
         }
 
         if (TryComp<SpriteComponent>(target, out var targetSprite))
         {
             // Use the target's holographic avatar (if available)
-            if (TryComp<HolographicAvatarComponent>(target, out var targetAvatar) &&
-                targetAvatar.LayerData != null)
+            if (holoAvatar is { LayerData: not null })
             {
                 if (replace)
-                    for (var i = 0; i < targetAvatar.LayerData.Length; i++)
+                    for (var i = 0; i < holoAvatar.LayerData.Length; i++)
                     {
-                        _sprite.AddLayer((hologram, hologramSprite), targetAvatar.LayerData[i], i);
+                        _sprite.AddLayer((hologram, hologramSprite), holoAvatar.LayerData[i], i);
                     }
             }
-
             // Otherwise copy the target's current physical appearance
             else
             {

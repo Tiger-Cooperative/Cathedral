@@ -164,6 +164,7 @@
   - type: Appearance
   - type: TypingIndicator
     proto: robot
+  - type: Eye
   - type: Speech
     speechVerb: Robotic
     speechSounds: Borg
