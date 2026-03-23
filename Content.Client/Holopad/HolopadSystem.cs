@@ -6,6 +6,8 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using System.Linq;
 using System.Numerics;
+using Content.Client._Cathedral.Holopad;
+using Robust.Client.Player;
 using DrawDepth = Content.Shared.DrawDepth.DrawDepth;
 
 namespace Content.Client.Holopad;
@@ -15,19 +17,29 @@ public sealed class HolopadSystem : SharedHolopadSystem
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly IOverlayManager _overlay = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeLocalEvent<HolopadHologramComponent, ComponentStartup>(OnComponentStartup);
+        SubscribeLocalEvent<HolopadHologramComponent, ComponentShutdown>(OnComponentShutdown);
         SubscribeLocalEvent<HolopadHologramComponent, BeforePostShaderRenderEvent>(OnShaderRender);
         SubscribeAllEvent<TypingChangedEvent>(OnTypingChanged);
+        _overlay.AddOverlay(new HolopadOverlay(EntityManager));
     }
 
     private void OnComponentStartup(Entity<HolopadHologramComponent> entity, ref ComponentStartup ev)
     {
         UpdateHologramSprite(entity, entity.Comp.LinkedEntity);
+        _overlay.AddOverlay(new HologramViewerOverlay(EntityManager, _playerManager));
+    }
+
+    private void OnComponentShutdown(Entity<HolopadHologramComponent> ent, ref ComponentShutdown ev)
+    {
+        _overlay.RemoveOverlay<HologramViewerOverlay>();
     }
 
     private void OnShaderRender(Entity<HolopadHologramComponent> entity, ref BeforePostShaderRenderEvent ev)
@@ -59,22 +71,34 @@ public sealed class HolopadSystem : SharedHolopadSystem
             !TryComp<HolopadHologramComponent>(hologram, out var holopadhologram))
             return;
 
-        // Remove all sprite layers
+        //TODO make this work for multi-layered sprites.
+        var replace = true;
+
+        // Remove all sprite layers only if it needs to change (right now just for holograms changing).
+        TryComp<HolographicAvatarComponent>(target, out var holoAvatar);
         for (var i = hologramSprite.AllLayers.Count() - 1; i >= 0; i--)
-            _sprite.RemoveLayer((hologram, hologramSprite), i);
+        {
+            var spriteRSI = _sprite.LayerGetEffectiveRsi((hologram, hologramSprite), i);
+            var spriteState = _sprite.LayerGetRsiState((hologram, hologramSprite), i);
+            replace = holoAvatar?.LayerData == null || spriteRSI == null
+                    || spriteRSI.Path.ToString() != "/Textures/" + holoAvatar.LayerData.First().RsiPath ||
+                    spriteState != holoAvatar.LayerData.First().State;
+
+            if (replace)
+                _sprite.RemoveLayer((hologram, hologramSprite), i);
+        }
 
         if (TryComp<SpriteComponent>(target, out var targetSprite))
         {
             // Use the target's holographic avatar (if available)
-            if (TryComp<HolographicAvatarComponent>(target, out var targetAvatar) &&
-                targetAvatar.LayerData != null)
+            if (holoAvatar is { LayerData: not null })
             {
-                for (var i = 0; i < targetAvatar.LayerData.Length; i++)
-                {
-                    _sprite.AddLayer((hologram, hologramSprite), targetAvatar.LayerData[i], i);
-                }
+                if (replace)
+                    for (var i = 0; i < holoAvatar.LayerData.Length; i++)
+                    {
+                        _sprite.AddLayer((hologram, hologramSprite), holoAvatar.LayerData[i], i);
+                    }
             }
-
             // Otherwise copy the target's current physical appearance
             else
             {

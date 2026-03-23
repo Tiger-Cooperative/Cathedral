@@ -12,7 +12,6 @@ using Content.Shared.Labels.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Power;
 using Content.Shared.Silicons.StationAi;
-using Content.Shared.Speech;
 using Content.Shared.Speech.Components;
 using Content.Shared.Telephone;
 using Content.Shared.UserInterface;
@@ -23,6 +22,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using System.Linq;
+using Content.Shared._Cathedral.EntityBound;
 
 namespace Content.Server.Holopad;
 
@@ -40,9 +40,11 @@ public sealed class HolopadSystem : SharedHolopadSystem
     [Dependency] private readonly PopupSystem _popupSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly PvsOverrideSystem _pvs = default!;
+    [Dependency] private readonly EntityBoundSystem _bound = default!;
 
     private float _updateTimer = 1.0f;
     private const float UpdateTime = 1.0f;
+    private const float HoloRange = 3.5f;
 
     public override void Initialize()
     {
@@ -193,7 +195,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
             // Switch the AI's perspective from free roaming to the target holopad
             _xformSystem.SetCoordinates(stationAiCore.Comp.RemoteEntity.Value, Transform(source).Coordinates);
-            _stationAiSystem.SwitchRemoteEntityMode(stationAiCore, false);
 
             return;
         }
@@ -265,9 +266,8 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
     private void OnHoloCallCommenced(Entity<HolopadComponent> source, ref TelephoneCallCommencedEvent args)
     {
-        if (source.Comp.Hologram == null)
-            GenerateHologram(source);
-
+        // A little weird to send the info to the other one first, but the holograms don't display the person if you use source.
+        // I can only assume it's something to do with the order of linking and generating the hologram.
         if (TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad) && receivingHolopad.Hologram == null)
             GenerateHologram((args.Receiver, receivingHolopad));
 
@@ -540,14 +540,8 @@ public sealed class HolopadSystem : SharedHolopadSystem
             return;
         }
 
+        holopadHologram.LinkedSource = entity.Owner;
         entity.Comp.Hologram = new Entity<HolopadHologramComponent>(hologramUid, holopadHologram);
-
-        // Relay speech preferentially through the hologram
-        if (TryComp<SpeechComponent>(hologramUid, out var hologramSpeech) &&
-            TryComp<TelephoneComponent>(entity, out var entityTelephone))
-        {
-            _telephoneSystem.SetSpeakerForTelephone((entity, entityTelephone), (hologramUid, hologramSpeech));
-        }
     }
 
     private void DeleteHologram(Entity<HolopadHologramComponent> hologram, Entity<HolopadComponent> attachedHolopad)
@@ -627,9 +621,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
         if (HasComp<StationAiHeldComponent>(entity.Comp.User) &&
             _stationAiSystem.TryGetCore(entity.Comp.User.Value, out var stationAiCore))
         {
-            // Return the AI eye to free roaming
-            _stationAiSystem.SwitchRemoteEntityMode(stationAiCore, true);
-
             // If the AI core is still broadcasting, end its calls
             if (TryComp<TelephoneComponent>(stationAiCore, out var stationAiCoreTelephone) &&
                 _telephoneSystem.IsTelephoneEngaged((stationAiCore.Owner, stationAiCoreTelephone)))
@@ -690,9 +681,12 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
         LinkHolopadToUser((stationAiCore, stationAiHolopad), user);
 
+        if (entity.Comp.Hologram != null)
+            // magic number in range is a placeholder for now, just picked based on what 'feels ok.'
+            _bound.BindToEntity(entity.Comp.Hologram.Value, entity.Owner, HoloRange);
+
         // Switch the AI's perspective from free roaming to the target holopad
         _xformSystem.SetCoordinates(stationAiCore.Comp.RemoteEntity.Value, Transform(entity).Coordinates);
-        _stationAiSystem.SwitchRemoteEntityMode(stationAiCore, false);
 
         // Open the holopad UI if it hasn't been opened yet
         if (TryComp<UserInterfaceComponent>(entity, out var entityUserInterfaceComponent))

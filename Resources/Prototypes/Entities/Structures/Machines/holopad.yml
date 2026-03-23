@@ -152,15 +152,36 @@
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
   - type: Transform
-    anchored: true
   - type: Sprite # Sprite data is dynamically set in Client.HolopadSystem
+    noRot: true
+    drawdepth: Mobs
+  - type: Physics
+    bodyType: KinematicController
+  - type: InputMover
+  - type: MobMover
+  - type: MovementSpeedModifier
+  - type: LagCompensation
   - type: Appearance
   - type: TypingIndicator
     proto: robot
+  - type: Eye
+  - type: ContentEye
+  - type: Examiner
   - type: Speech
     speechVerb: Robotic
     speechSounds: Borg
     speechBubbleOffset: 0.45
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.35
+        density: 50
+        mask:
+        - Opaque
+        layer:
+        - Opaque
   - type: HolopadHologram
     rsiPath: Structures/Machines/holopad.rsi
     rsiState: icon_in_call
@@ -170,7 +191,7 @@
     alpha: 0.9
     intensity: 2
     scrollRate: 0.125
-    offset: -0.02, 0.45
+#    offset: -0.02, 0.45
   - type: Tag
     tags:
     - HideContextMenu
