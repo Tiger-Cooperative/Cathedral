@@ -156,23 +156,21 @@ public abstract partial class SharedStationAiSystem : EntitySystem
 
     private void OnTelephoneCall(Entity<StationAiCoreComponent> ent, ref TelephoneCallCommencedEvent args)
     {
-        // The main issue here is that everything gets done BEFORE the other eye is created.
-            if (!TryGetHeld((ent, ent.Comp), out var held) || ent.Comp.RemoteEntity == null ||
-                !TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad)  || receivingHolopad.Hologram == null
-                || _timing.ApplyingState)
-                return;
-            if (TryComp<EyeComponent>(held.Value, out var eyeComp))
-            {
-                _audio.PlayPvs(new SoundPathSpecifier("/Audio/Items/bikehorn.ogg"), args.Receiver);
-                _eye.SetDrawFov(held.Value, false, eyeComp);
-                _eye.SetTarget(held.Value, receivingHolopad.Hologram.Value, eyeComp);
-            }
-            _mover.SetRelay(held.Value, receivingHolopad.Hologram.Value);
+        if (!TryGetHeld((ent, ent.Comp), out var held) || ent.Comp.RemoteEntity == null ||
+            !TryComp<HolopadComponent>(args.Receiver, out var receivingHolopad)  || receivingHolopad.Hologram == null
+            || _timing.ApplyingState)
+            return;
+        if (TryComp<EyeComponent>(held.Value, out var eyeComp))
+        {
+            _eye.SetDrawFov(held.Value, false, eyeComp);
+            _eye.SetTarget(held.Value, receivingHolopad.Hologram.Value, eyeComp);
+        }
+        _mover.SetRelay(held.Value, receivingHolopad.Hologram.Value);
+        ent.Comp.Remote = false;
     }
 
     private void OnTelephoneEnd(Entity<StationAiCoreComponent> ent, ref TelephoneCallEndedEvent args)
     {
-        // I feel like fringe errors will pop up as people use this.
         if (!TryGetHeld((ent, ent.Comp), out var held) || ent.Comp.RemoteEntity == null || _timing.ApplyingState)
             return;
         if (TryComp<EyeComponent>(held.Value, out var eyeComp))
@@ -181,6 +179,7 @@ public abstract partial class SharedStationAiSystem : EntitySystem
             _eye.SetTarget(held.Value, ent.Comp.RemoteEntity, eyeComp);
         }
         _mover.SetRelay(held.Value, ent.Comp.RemoteEntity.Value);
+        ent.Comp.Remote = true;
     }
 
     private void OnAiAccessible(Entity<StationAiOverlayComponent> ent, ref AccessibleOverrideEvent args)
@@ -427,39 +426,6 @@ public abstract partial class SharedStationAiSystem : EntitySystem
         {
             _mobState.ChangeMobState(held.Value, MobState.Dead);
         }
-    }
-
-    public void SwitchRemoteEntityMode(Entity<StationAiCoreComponent?> entity, bool isRemote)
-    {
-        if (entity.Comp?.Remote == null || entity.Comp.Remote == isRemote)
-            return;
-
-        var ent = new Entity<StationAiCoreComponent>(entity.Owner, entity.Comp);
-
-        ent.Comp.Remote = isRemote;
-
-        EntityCoordinates? coords = ent.Comp.RemoteEntity != null ? Transform(ent.Comp.RemoteEntity.Value).Coordinates : null;
-
-        // Attach new eye
-        var oldEye = ent.Comp.RemoteEntity;
-
-        ClearEye(ent);
-
-        if (SetupEye(ent, coords))
-            AttachEye(ent);
-
-        if (oldEye != null)
-        {
-            // Raise the following event on the old eye before it's deleted
-            var ev = new StationAiRemoteEntityReplacementEvent(ent.Comp.RemoteEntity);
-            RaiseLocalEvent(oldEye.Value, ref ev);
-        }
-
-        // Adjust user FoV
-        var user = GetInsertedAI(ent);
-
-        if (TryComp<EyeComponent>(user, out var eye))
-            _eye.SetDrawFov(user.Value, !isRemote);
     }
 
     protected bool SetupEye(Entity<StationAiCoreComponent> ent, EntityCoordinates? coords = null)

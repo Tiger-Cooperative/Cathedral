@@ -165,6 +165,8 @@
   - type: TypingIndicator
     proto: robot
   - type: Eye
+  - type: ContentEye
+  - type: Examiner
   - type: Speech
     speechVerb: Robotic
     speechSounds: Borg
