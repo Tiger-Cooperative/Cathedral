@@ -1,0 +1,11 @@
+- type: entity
+  parent: GasTankBase
+  id: ChemTankBase
+  components:
+  - type: ItemSlots
+    slots:
+      beakerSlot:
+        whitelist:
+          components:
+            - FitsInDispenser
+  - type: ChemVaporizer

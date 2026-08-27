@@ -1,8 +1,8 @@
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Body.Components;
 using Content.Server.Popups;
+using Content.Shared._Cathedral.Atmos;
 using Content.Shared.Alert;
-using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
@@ -62,6 +62,8 @@ public sealed class InternalsSystem : SharedInternalsSystem
             args.Gas = _gasTank.RemoveAirVolume((ent.Comp.GasTankEntity.Value, gasTank), args.Respirator.BreathVolume);
             // TODO: Should listen to gas tank updates instead I guess?
             _alerts.ShowAlert(ent.Owner, ent.Comp.InternalsAlert, GetSeverity(ent));
+            var ev = new GasTankInhaledFromEvent {Inhaler = ent.Owner};
+            RaiseLocalEvent(ent.Comp.GasTankEntity.Value, ev);
         }
     }
 }
