@@ -29,8 +29,7 @@ public sealed class ChemVaporizerSystem : SharedChemVaporizerSystem
 
     private void OnGasTankInhaledFrom(Entity<ChemVaporizerComponent> ent, ref GasTankInhaledFromEvent args)
     {
-
-        if (!TryComp<ItemSlotsComponent>(ent.Owner, out var itemSlots))
+        if (!TryComp<ItemSlotsComponent>(ent.Owner, out var itemSlots) || args.TankLowPressure)
             return;
         var container = _itemSlots.GetItemOrNull(ent.Owner, ent.Comp.SolutionSlotName, itemSlots);
         if (container != null && TryComp<SolutionContainerManagerComponent>(container, out var solutionContainerManager)

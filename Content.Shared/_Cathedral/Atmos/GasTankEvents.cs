@@ -1,4 +1,5 @@
-﻿using Content.Shared.Body.Components;
+﻿using Content.Shared.Atmos;
+using Content.Shared.Body.Components;
 
 namespace Content.Shared._Cathedral.Atmos;
 
@@ -8,6 +9,8 @@ namespace Content.Shared._Cathedral.Atmos;
 public sealed class GasTankInhaledFromEvent : EntityEventArgs
 {
     public EntityUid Inhaler;
+
+    public bool TankLowPressure;
 }
 
 /// <summary>

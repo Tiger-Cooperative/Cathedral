@@ -1,6 +1,8 @@
 - type: entity
   parent: GasTankBase
-  id: ChemTankBase
+  id: ChemTank
+  name: Chemical Vaporizer Tank
+  description: Not for recreational use, at least according to doctors.
   components:
   - type: ItemSlots
     slots:
@@ -9,3 +11,9 @@
           components:
             - FitsInDispenser
   - type: ChemVaporizer
+  - type: Sprite
+    sprite: _Cathedral/Objects/chemtank.rsi
+  - type: Item
+    sprite: _Cathedral/Objects/chemtank.rsi
+  - type: Clothing
+    sprite: _Cathedral/Objects/chemtank.rsi

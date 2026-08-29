@@ -62,7 +62,7 @@ public sealed class InternalsSystem : SharedInternalsSystem
             args.Gas = _gasTank.RemoveAirVolume((ent.Comp.GasTankEntity.Value, gasTank), args.Respirator.BreathVolume);
             // TODO: Should listen to gas tank updates instead I guess?
             _alerts.ShowAlert(ent.Owner, ent.Comp.InternalsAlert, GetSeverity(ent));
-            var ev = new GasTankInhaledFromEvent {Inhaler = ent.Owner};
+            var ev = new GasTankInhaledFromEvent {Inhaler = ent.Owner, TankLowPressure = gasTank.IsLowPressure};
             RaiseLocalEvent(ent.Comp.GasTankEntity.Value, ev);
         }
     }
