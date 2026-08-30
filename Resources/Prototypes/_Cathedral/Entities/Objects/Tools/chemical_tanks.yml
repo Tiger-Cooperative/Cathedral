@@ -17,3 +17,4 @@
     sprite: _Cathedral/Objects/chemtank.rsi
   - type: Clothing
     sprite: _Cathedral/Objects/chemtank.rsi
+  - type: ContainerContainer
