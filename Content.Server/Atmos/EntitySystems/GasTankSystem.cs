@@ -1,4 +1,5 @@
 using Content.Server.Explosion.EntitySystems;
+using Content.Shared._Cathedral.Atmos;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
 using Content.Shared.Atmos.EntitySystems;
@@ -119,6 +120,8 @@ namespace Content.Server.Atmos.EntitySystems
             _throwing.TryThrow(gasTank, dir * strength, strength);
             if (gasTank.Comp.OutputPressure >= MinimumSoundValvePressure)
                 _audioSys.PlayPvs(gasTank.Comp.RuptureSound, gasTank);
+            var ev = new GasTankGasReleasedEvent();
+            RaiseLocalEvent(gasTank, ev);
         }
 
         public GasMixture? RemoveAir(Entity<GasTankComponent> gasTank, float amount)
