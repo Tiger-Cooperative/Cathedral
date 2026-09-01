@@ -6,7 +6,7 @@
   components:
   - type: ItemSlots
     slots:
-      beakerSlot:
+      beaker_slot:
         whitelist:
           components:
             - FitsInDispenser
