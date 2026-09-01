@@ -18,3 +18,5 @@
   - type: Clothing
     sprite: _Cathedral/Objects/chemtank.rsi
   - type: ContainerContainer
+    containers:
+      beaker_slot: !type:ContainerSlot

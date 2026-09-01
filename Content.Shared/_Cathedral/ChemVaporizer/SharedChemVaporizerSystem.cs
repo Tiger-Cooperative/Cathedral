@@ -8,9 +8,6 @@ namespace Content.Shared._Cathedral.ChemVaporizer;
 
 public abstract class SharedChemVaporizerSystem : EntitySystem
 {
-    [Dependency] private readonly SharedSolutionContainerSystem _solution = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly SharedBloodstreamSystem _bloodstream = default!;
     public override void Initialize()
     {
         base.Initialize();
